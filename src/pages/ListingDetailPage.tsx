@@ -386,6 +386,10 @@ const ListingDetailPage = () => {
 										className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors"
 										title="Distribuie anunțul"
 									>
+										onClick={handleShare}
+										className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors"
+										title="Distribuie anunțul"
+									>
 										<Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
 									</button>
 								</div>
