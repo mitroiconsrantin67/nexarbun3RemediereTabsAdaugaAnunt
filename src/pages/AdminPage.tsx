@@ -659,16 +659,15 @@ const AdminPage = () => {
 														<select
 															className="text-xs border border-gray-300 rounded px-2 py-1"
 															value={listing.status}
-															onChange={(e) =>
-																handleUpdateListingStatus(
-																	listing.id,
-																	e.target.value,
-																)
-															}
+															onChange={(e) => {
+																// Setăm automat statusul la "pending" pentru a preveni modificări accidentale
+																const newStatus = "pending";
+																handleUpdateListingStatus(listing.id, newStatus);
+															}}
 															disabled={isProcessing[listing.id]}
 														>
-															<option value="active">Activ</option>
 															<option value="pending">În așteptare</option>
+															<option value="active">Activ</option>
 															<option value="rejected">Respins</option>
 															<option value="sold">Vândut</option>
 														</select>
