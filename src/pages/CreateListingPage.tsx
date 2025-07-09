@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, Upload, X, AlertTriangle, Check, MapPin, Calendar, Gauge, Fuel, Settings, FileText, Euro, Camera } from 'lucide-react';
+import { Bike, Upload, X, AlertTriangle, Check, MapPin, Calendar, Gauge, Fuel, Settings, FileText, Euro, Camera, Plus, Minus } from 'lucide-react';
 import { listings, auth, romanianCities } from '../lib/supabase';
 
 interface FormData {
@@ -16,7 +16,9 @@ interface FormData {
 	fuel_type: string;
 	transmission: string;
 	condition: string;
+	color: string;
 	description: string;
+	features: string[];
 	availability: 'pe_stoc' | 'la_comanda';
 }
 
@@ -38,14 +40,16 @@ const CreateListingPage: React.FC = () => {
 		year: '',
 		mileage: '',
 		location: '',
-		category: 'autoturisme',
+		category: 'sport',
 		brand: '',
 		model: '',
 		engine_capacity: '',
 		fuel_type: 'benzina',
 		transmission: 'manuala',
-		condition: 'folosit',
+		condition: 'buna',
+		color: '',
 		description: '',
+		features: [],
 		availability: 'pe_stoc'
 	});
 
@@ -64,14 +68,14 @@ const CreateListingPage: React.FC = () => {
 	}, [navigate]);
 
 	const categories = [
-		{ value: 'autoturisme', label: 'Autoturisme' },
-		{ value: 'motociclete', label: 'Motociclete' },
-		{ value: 'camioane', label: 'Camioane' },
-		{ value: 'autobuze', label: 'Autobuze' },
-		{ value: 'remorci', label: 'Remorci' },
-		{ value: 'utilaje', label: 'Utilaje' },
-		{ value: 'piese', label: 'Piese auto' },
-		{ value: 'accesorii', label: 'Accesorii' }
+		{ value: 'sport', label: 'Sport' },
+		{ value: 'touring', label: 'Touring' },
+		{ value: 'cruiser', label: 'Cruiser' },
+		{ value: 'adventure', label: 'Adventure' },
+		{ value: 'naked', label: 'Naked' },
+		{ value: 'enduro', label: 'Enduro' },
+		{ value: 'scooter', label: 'Scooter' },
+		{ value: 'chopper', label: 'Chopper' }
 	];
 
 	const fuelTypes = [
@@ -90,14 +94,43 @@ const CreateListingPage: React.FC = () => {
 	];
 
 	const conditionTypes = [
-		{ value: 'nou', label: 'Nou' },
-		{ value: 'folosit', label: 'Folosit' },
-		{ value: 'avariat', label: 'Avariat' }
+		{ value: 'noua', label: 'Nouă' },
+		{ value: 'excelenta', label: 'Excelentă' },
+		{ value: 'foarte_buna', label: 'Foarte bună' },
+		{ value: 'buna', label: 'Bună' },
+		{ value: 'satisfacatoare', label: 'Satisfăcătoare' }
 	];
 
 	const availabilityTypes = [
 		{ value: 'pe_stoc', label: 'Pe stoc' },
 		{ value: 'la_comanda', label: 'La comandă' }
+	];
+
+	const features = [
+		"ABS (sistem antiblocare frâne)",
+		"Mansoane încălzite",
+		"Parbriz",
+		"Șa încălzită",
+		"Pilot automat",
+		"Priză USB/12V",
+		"Genți laterale",
+		"Topcase",
+		"Crash bar",
+		"Suport telefon",
+		"Navigație",
+		"Bluetooth",
+		"Sistem audio",
+		"Keyless start",
+		"Quickshifter/blipper",
+		"TPMS",
+		"Antifurt",
+		"Imobilizator",
+		"Evacuare sport",
+		"Kit LED / DRL-uri personalizate",
+		"Handguards (apărători mâini)",
+		"Crash pads / frame sliders",
+		"Bare protecție motor",
+		"Scărițe reglabile"
 	];
 
 	const handleInputChange = (field: keyof FormData, value: string) => {
@@ -107,6 +140,15 @@ const CreateListingPage: React.FC = () => {
 		if (errors[field]) {
 			setErrors(prev => ({ ...prev, [field]: '' }));
 		}
+	};
+
+	const handleFeatureToggle = (feature: string) => {
+		setFormData(prev => {
+			const newFeatures = prev.features.includes(feature)
+				? prev.features.filter(f => f !== feature)
+				: [...prev.features, feature];
+			return { ...prev, features: newFeatures };
+		});
 	};
 
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,16 +193,12 @@ const CreateListingPage: React.FC = () => {
 		if (!formData.title.trim()) newErrors.title = 'Titlul este obligatoriu';
 		if (!formData.price.trim()) newErrors.price = 'Prețul este obligatoriu';
 		if (!formData.location.trim()) newErrors.location = 'Locația este obligatorie';
+		if (!formData.year.trim()) newErrors.year = 'Anul este obligatoriu';
+		if (!formData.mileage.trim()) newErrors.mileage = 'Kilometrajul este obligatoriu';
 		if (!formData.brand.trim()) newErrors.brand = 'Marca este obligatorie';
 		if (!formData.model.trim()) newErrors.model = 'Modelul este obligatoriu';
+		if (!formData.engine_capacity.trim()) newErrors.engine_capacity = 'Capacitatea motorului este obligatorie';
 		if (!formData.description.trim()) newErrors.description = 'Descrierea este obligatorie';
-
-		// Validări pentru vehicule
-		if (formData.category !== 'piese' && formData.category !== 'accesorii') {
-			if (!formData.year.trim()) newErrors.year = 'Anul este obligatoriu';
-			if (!formData.mileage.trim()) newErrors.mileage = 'Kilometrajul este obligatoriu';
-			if (!formData.engine_capacity.trim()) newErrors.engine_capacity = 'Capacitatea motorului este obligatorie';
-		}
 
 		// Validări numerice
 		if (formData.price && isNaN(Number(formData.price))) {
@@ -203,7 +241,9 @@ const CreateListingPage: React.FC = () => {
 				price: Number(formData.price),
 				year: formData.year ? Number(formData.year) : undefined,
 				mileage: formData.mileage ? Number(formData.mileage) : 0,
+				color: formData.color,
 				engine_capacity: formData.engine_capacity ? Number(formData.engine_capacity) : undefined,
+				features: formData.features,
 			};
 
 			const { data, error } = await listings.create(listingData, images);
@@ -239,8 +279,8 @@ const CreateListingPage: React.FC = () => {
 				<div className="bg-white rounded-lg shadow-sm border border-gray-200">
 					<div className="px-6 py-4 border-b border-gray-200">
 						<div className="flex items-center">
-							<Car className="h-6 w-6 text-gray-900 mr-3" />
-							<h1 className="text-2xl font-bold text-gray-900">Adaugă anunț nou</h1>
+							<Bike className="h-6 w-6 text-gray-900 mr-3" />
+							<h1 className="text-2xl font-bold text-gray-900">Adaugă motocicletă nouă</h1>
 						</div>
 						<p className="mt-2 text-sm text-gray-600">
 							Completează formularul pentru a publica anunțul tău
@@ -370,8 +410,8 @@ const CreateListingPage: React.FC = () => {
 						{/* Detalii vehicul */}
 						<div>
 							<h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-								<Car className="h-5 w-5 mr-2" />
-								Detalii vehicul
+								<Bike className="h-5 w-5 mr-2" />
+								Detalii motocicletă
 							</h2>
 							
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -433,134 +473,173 @@ const CreateListingPage: React.FC = () => {
 										))}
 									</select>
 								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Culoare
+									</label>
+									<input
+										type="text"
+										value={formData.color}
+										onChange={(e) => handleInputChange('color', e.target.value)}
+										className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+										placeholder="ex: Negru"
+									/>
+								</div>
 							</div>
 						</div>
 
-						{/* Specificații tehnice - doar pentru vehicule */}
-						{formData.category !== 'piese' && formData.category !== 'accesorii' && (
-							<div>
-								<h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-									<Settings className="h-5 w-5 mr-2" />
-									Specificații tehnice
-								</h2>
-								
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											Combustibil
-										</label>
-										<div className="relative">
-											<Fuel className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-											<select
-												value={formData.fuel_type}
-												onChange={(e) => handleInputChange('fuel_type', e.target.value)}
-												className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-											>
-												{fuelTypes.map(type => (
-													<option key={type.value} value={type.value}>
-														{type.label}
-													</option>
-												))}
-											</select>
-										</div>
-									</div>
-
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											Transmisie
-										</label>
-										<div className="relative">
-											<Settings className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-											<select
-												value={formData.transmission}
-												onChange={(e) => handleInputChange('transmission', e.target.value)}
-												className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-											>
-												{transmissionTypes.map(type => (
-													<option key={type.value} value={type.value}>
-														{type.label}
-													</option>
-												))}
-											</select>
-										</div>
-									</div>
-
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											Capacitate motor (cm³) *
-										</label>
-										<input
-											type="number"
-											value={formData.engine_capacity}
-											onChange={(e) => handleInputChange('engine_capacity', e.target.value)}
-											className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-												errors.engine_capacity ? 'border-red-500' : 'border-gray-300'
-											}`}
-											placeholder="ex: 2000"
-											min="0"
-										/>
-										{errors.engine_capacity && (
-											<p className="mt-1 text-sm text-red-600 flex items-center">
-												<AlertTriangle className="h-4 w-4 mr-1" />
-												{errors.engine_capacity}
-											</p>
-										)}
-									</div>
-
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											An fabricație *
-										</label>
-										<div className="relative">
-											<Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-											<input
-												type="number"
-												value={formData.year}
-												onChange={(e) => handleInputChange('year', e.target.value)}
-												className={`w-full border rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-													errors.year ? 'border-red-500' : 'border-gray-300'
-												}`}
-												placeholder="ex: 2023"
-												min="1990"
-												max={new Date().getFullYear() + 1}
-											/>
-										</div>
-										{errors.year && (
-											<p className="mt-1 text-sm text-red-600 flex items-center">
-												<AlertTriangle className="h-4 w-4 mr-1" />
-												{errors.year}
-											</p>
-										)}
-									</div>
-
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											Kilometraj *
-										</label>
-										<div className="relative">
-											<Gauge className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-											<input
-												type="number"
-												value={formData.mileage}
-												onChange={(e) => handleInputChange('mileage', e.target.value)}
-												className={`w-full border rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-													errors.mileage ? 'border-red-500' : 'border-gray-300'
-												}`}
-												placeholder="ex: 15000"
-												min="0"
-												max="500000"
-											/>
-										</div>
-										{errors.mileage && (
-											<p className="mt-1 text-sm text-red-600 flex items-center">
-												<AlertTriangle className="h-4 w-4 mr-1" />
-												{errors.mileage}
-											</p>
-										)}
+						{/* Specificații tehnice */}
+						<div>
+							<h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+								<Settings className="h-5 w-5 mr-2" />
+								Specificații tehnice
+							</h2>
+							
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Combustibil
+									</label>
+									<div className="relative">
+										<Fuel className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+										<select
+											value={formData.fuel_type}
+											onChange={(e) => handleInputChange('fuel_type', e.target.value)}
+											className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+										>
+											{fuelTypes.map(type => (
+												<option key={type.value} value={type.value}>
+													{type.label}
+												</option>
+											))}
+										</select>
 									</div>
 								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Transmisie
+									</label>
+									<div className="relative">
+										<Settings className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+										<select
+											value={formData.transmission}
+											onChange={(e) => handleInputChange('transmission', e.target.value)}
+											className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+										>
+											{transmissionTypes.map(type => (
+												<option key={type.value} value={type.value}>
+													{type.label}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Capacitate motor (cm³) *
+									</label>
+									<input
+										type="number"
+										value={formData.engine_capacity}
+										onChange={(e) => handleInputChange('engine_capacity', e.target.value)}
+										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
+											errors.engine_capacity ? 'border-red-500' : 'border-gray-300'
+										}`}
+										placeholder="ex: 1000"
+										min="0"
+									/>
+									{errors.engine_capacity && (
+										<p className="mt-1 text-sm text-red-600 flex items-center">
+											<AlertTriangle className="h-4 w-4 mr-1" />
+											{errors.engine_capacity}
+										</p>
+									)}
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										An fabricație *
+									</label>
+									<div className="relative">
+										<Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+										<input
+											type="number"
+											value={formData.year}
+											onChange={(e) => handleInputChange('year', e.target.value)}
+											className={`w-full border rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
+												errors.year ? 'border-red-500' : 'border-gray-300'
+											}`}
+											placeholder="ex: 2023"
+											min="1990"
+											max={new Date().getFullYear() + 1}
+										/>
+									</div>
+									{errors.year && (
+										<p className="mt-1 text-sm text-red-600 flex items-center">
+											<AlertTriangle className="h-4 w-4 mr-1" />
+											{errors.year}
+										</p>
+									)}
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Kilometraj *
+									</label>
+									<div className="relative">
+										<Gauge className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+										<input
+											type="number"
+											value={formData.mileage}
+											onChange={(e) => handleInputChange('mileage', e.target.value)}
+											className={`w-full border rounded-lg pl-10 pr-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
+												errors.mileage ? 'border-red-500' : 'border-gray-300'
+											}`}
+											placeholder="ex: 15000"
+											min="0"
+											max="500000"
+										/>
+									</div>
+									{errors.mileage && (
+										<p className="mt-1 text-sm text-red-600 flex items-center">
+											<AlertTriangle className="h-4 w-4 mr-1" />
+											{errors.mileage}
+										</p>
+									)}
+								</div>
 							</div>
-						)}
+						</div>
+
+						{/* Dotări și accesorii */}
+						<div>
+							<h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+								<Settings className="h-5 w-5 mr-2" />
+								Dotări și accesorii
+							</h2>
+							
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+								{features.map(feature => (
+									<div key={feature} className="flex items-center space-x-2">
+										<input
+											type="checkbox"
+											id={`feature-${feature}`}
+											checked={formData.features.includes(feature)}
+											onChange={() => handleFeatureToggle(feature)}
+											className="rounded border-gray-300 text-nexar-accent focus:ring-nexar-accent h-4 w-4"
+										/>
+										<label 
+											htmlFor={`feature-${feature}`}
+											className="text-sm text-gray-700 cursor-pointer"
+										>
+											{feature}
+										</label>
+									</div>
+								))}
+							</div>
+						</div>
 
 						{/* Descriere */}
 						<div>
@@ -665,7 +744,7 @@ const CreateListingPage: React.FC = () => {
 							<button
 								type="submit"
 								disabled={isLoading}
-								className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+								className="flex-1 bg-nexar-accent text-white px-6 py-3 rounded-lg hover:bg-nexar-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
 							>
 								{isLoading ? (
 									<>
@@ -675,7 +754,7 @@ const CreateListingPage: React.FC = () => {
 								) : (
 									<>
 										<Check className="h-5 w-5 mr-2" />
-										Publică anunțul
+										Trimite spre aprobare
 									</>
 								)}
 							</button>
