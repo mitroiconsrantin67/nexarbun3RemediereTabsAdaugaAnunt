@@ -4,6 +4,30 @@ import { Bike, Upload, X, AlertTriangle, Check, MapPin, Calendar, Gauge, Fuel, S
 import { listings, auth, romanianCities } from '../lib/supabase';
 import SuccessModal from '../components/SuccessModal';
 
+// Lista de mărci de motociclete
+const motorcycleBrands = [
+	"Yamaha",
+	"Honda",
+	"Suzuki",
+	"Kawasaki",
+	"BMW",
+	"Ducati",
+	"KTM",
+	"Aprilia",
+	"Triumph",
+	"Harley-Davidson",
+	"MV Agusta",
+	"Benelli",
+	"Moto Guzzi",
+	"Indian",
+	"Zero",
+	"Energica",
+	"Husqvarna",
+	"Beta",
+	"Sherco",
+	"GasGas",
+];
+
 interface FormData {
 	title: string;
 	price: string;
@@ -434,15 +458,20 @@ const CreateListingPage: React.FC = () => {
 									<label className="block text-sm font-medium text-gray-700 mb-2">
 										Marca *
 									</label>
-									<input
-										type="text"
+									<select
 										value={formData.brand}
 										onChange={(e) => handleInputChange('brand', e.target.value)}
 										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 											errors.brand ? 'border-red-500' : 'border-gray-300'
 										}`}
-										placeholder="ex: BMW"
-									/>
+									>
+										<option value="">Selectează marca</option>
+										{motorcycleBrands.map(brand => (
+											<option key={brand} value={brand}>
+												{brand}
+											</option>
+										))}
+									</select>
 									{errors.brand && (
 										<p className="mt-1 text-sm text-red-600 flex items-center">
 											<AlertTriangle className="h-4 w-4 mr-1" />

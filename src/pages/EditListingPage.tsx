@@ -2,6 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Store, Clock, Upload, X, Plus, Minus } from 'lucide-react';
+import SuccessModal from '../components/SuccessModal';
+
+// Lista de mărci de motociclete
+const motorcycleBrands = [
+  "Yamaha",
+  "Honda",
+  "Suzuki",
+  "Kawasaki",
+  "BMW",
+  "Ducati",
+  "KTM",
+  "Aprilia",
+  "Triumph",
+  "Harley-Davidson",
+  "MV Agusta",
+  "Benelli",
+  "Moto Guzzi",
+  "Indian",
+  "Zero",
+  "Energica",
+  "Husqvarna",
+  "Beta",
+  "Sherco",
+  "GasGas",
+];
 
 const availabilityOptions = [
   {
@@ -50,6 +75,7 @@ const EditListingPage = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
+    id: '',
     title: '',
     brand: '',
     model: '',
@@ -65,6 +91,8 @@ const EditListingPage = () => {
     features: [] as string[],
     images: [] as string[]
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
 
   useEffect(() => {
     loadListing();
@@ -85,6 +113,7 @@ const EditListingPage = () => {
 
       if (data) {
         setFormData({
+          id: data.id,
           title: data.title || '',
           brand: data.brand || '',
           model: data.model || '',
@@ -125,12 +154,24 @@ const EditListingPage = () => {
     }));
   };
 
+  const handleFeatureToggle = (feature: string) => {
+    const newFeatures = formData.features.includes(feature) ? formData.features.filter(f => f !== feature) : [...formData.features, feature];
+    setFormData(prev => ({ ...prev, features: newFeatures }));
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setUploading(true);
     const uploadedUrls: string[] = [];
+
+    // Verificăm dacă am atins limita de 10 imagini
+    if (files.length + formData.images.length - imagesToRemove.length > 10) {
+      alert('Poți încărca maximum 10 imagini');
+      setUploading(false);
+      return;
+    }
 
     try {
       for (const file of Array.from(files)) {
@@ -139,13 +180,13 @@ const EditListingPage = () => {
         const filePath = `listings/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('images')
+          .from('listing-images')
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
         const { data } = supabase.storage
-          .from('images')
+          .from('listing-images')
           .getPublicUrl(filePath);
 
         uploadedUrls.push(data.publicUrl);
@@ -163,7 +204,8 @@ const EditListingPage = () => {
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
+    const imageToRemove = formData.images[index];
+    setFormData(prev => ({ 
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
@@ -180,30 +222,30 @@ const EditListingPage = () => {
     
     try {
       const { error } = await supabase
-        .from('listings')
-        .update({
-          title: formData.title,
-          brand: formData.brand,
-          model: formData.model,
-          year: parseInt(formData.year),
-          price: parseFloat(formData.price),
-          mileage: parseInt(formData.mileage),
-          engine_capacity: parseInt(formData.engine_capacity),
-          fuel_type: formData.fuel_type,
-          transmission: formData.transmission,
-          color: formData.color,
-          availability: formData.availability,
-          description: formData.description,
-          features: formData.features, 
-          images: formData.images,
-          updated_at: new Date().toISOString(),
-          status: "pending" // Setăm statusul la pending pentru a aștepta aprobarea
-        })
-        .eq('id', id);
+      .from('listings')
+      .update({
+        title: formData.title,
+        brand: formData.brand,
+        model: formData.model,
+        year: parseInt(formData.year),
+        price: parseFloat(formData.price),
+        mileage: parseInt(formData.mileage),
+        engine_capacity: parseInt(formData.engine_capacity),
+        fuel_type: formData.fuel_type,
+        transmission: formData.transmission,
+        color: formData.color,
+        availability: formData.availability,
+        description: formData.description,
+        features: formData.features, 
+        images: formData.images,
+        updated_at: new Date().toISOString(),
+        status: "pending" // Setăm statusul la pending pentru a aștepta aprobarea
+      })
+      .eq('id', id);
 
       if (error) throw error;
 
-      navigate(`/listing/${id}`);
+      setShowSuccessModal(true);
       
     } catch (error) {
       console.error('Error updating listing:', error);
@@ -214,6 +256,18 @@ const EditListingPage = () => {
       sessionStorage.removeItem('submissionInProgress');
       setLoading(false);
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
+
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
+  const handleViewListing = () => {
+    navigate(`/anunt/${id}`);
   };
 
   if (loading) {
@@ -254,14 +308,20 @@ const EditListingPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Marcă *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="brand"
                   value={formData.brand}
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
+                >
+                  <option value="">Selectează marca</option>
+                  {motorcycleBrands.map(brand => (
+                    <option key={brand} value={brand}>
+                      {brand}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -368,7 +428,7 @@ const EditListingPage = () => {
                   <option value="">Selectează</option>
                   <option value="manuala">Manuală</option>
                   <option value="automata">Automată</option>
-                  <option value="cvt">CVT</option>
+                  <option value="semi-automata">Semi-automată</option>
                 </select>
               </div>
 
@@ -493,7 +553,7 @@ const EditListingPage = () => {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate(`/listing/${id}`)}
+                onClick={() => navigate(`/anunt/${id}`)}
                 className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
                 Anulează
@@ -509,6 +569,19 @@ const EditListingPage = () => {
           </form>
         </div>
       </div>
+      
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleCloseSuccessModal}
+          onGoHome={handleGoHome}
+          onViewListing={handleViewListing}
+          title="Modificări salvate!"
+          message="Modificările tale au fost trimise spre aprobare. Anunțul va fi actualizat după ce va fi revizuit de echipa noastră."
+          showViewButton={true}
+        />
+      )}
     </div>
   );
 };
