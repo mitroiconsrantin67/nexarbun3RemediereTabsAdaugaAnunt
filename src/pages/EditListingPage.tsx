@@ -154,11 +154,6 @@ const EditListingPage = () => {
     }));
   };
 
-  const handleFeatureToggle = (feature: string) => {
-    const newFeatures = formData.features.includes(feature) ? formData.features.filter(f => f !== feature) : [...formData.features, feature];
-    setFormData(prev => ({ ...prev, features: newFeatures }));
-  };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
