@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Filter, X, ChevronDown, ChevronUp, MapPin, Calendar, Gauge, Fuel, Settings, Building, User, Check, AlertTriangle, RefreshCw, Store, Clock, Tag } from 'lucide-react';
-import { listings, enhancedListings, romanianCities } from '../lib/supabase';
+import { listings, romanianCities } from '../lib/supabase';
+import { enhancedListings } from '../lib/supabase-enhanced';
 import NetworkErrorHandler from '../components/NetworkErrorHandler';
 
 const SearchPage = () => {
