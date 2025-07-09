@@ -1,6 +1,3 @@
-Here's the fixed script with the missing closing brackets:
-
-```javascript
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 

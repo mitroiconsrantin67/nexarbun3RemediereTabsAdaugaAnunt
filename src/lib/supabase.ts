@@ -34,34 +34,6 @@ const createSupabaseClient = () => {
 };
 
 export const supabase = createSupabaseClient();
-// Singleton pentru a preveni multiple instanțe GoTrueClient
-let supabaseInstance: any = null;
-
-const createSupabaseClient = () => {
-	if (supabaseInstance) {
-		return supabaseInstance;
-	}
-
-	supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-		auth: {
-			autoRefreshToken: true,
-			persistSession: true,
-			detectSessionInUrl: true,
-			flowType: "pkce",
-			// Prevenim multiple instanțe
-			storageKey: 'nexar-auth-token',
-		},
-		global: {
-			headers: {
-				'X-Client-Info': 'nexar-app'
-			}
-		}
-	});
-
-	return supabaseInstance;
-};
-
-export const supabase = createSupabaseClient();
 
 // Tipuri pentru baza de date
 export interface Listing {
