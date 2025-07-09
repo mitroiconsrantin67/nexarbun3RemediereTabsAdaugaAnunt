@@ -325,16 +325,16 @@ const AdminPage = () => {
 	// };
 
 	const handleViewListing = (listingId: string) => {
-		window.open(`/anunt/${listingId}`, "_blank");
+		navigate(`/anunt/${listingId}`);
 	};
 
 	const handleEditListing = (listingId: string) => {
 		navigate(`/editeaza-anunt/${listingId}`);
 	};
 
-	// const handleViewProfile = (userId: string) => {
-	// 	navigate(`/profil/${userId}`);
-	// };
+	const handleViewProfile = (userId: string) => {
+		navigate(`/profil/${userId}`);
+	};
 
 	const filteredListings = listings.filter((listing) => {
 		const matchesSearch =
@@ -351,13 +351,13 @@ const AdminPage = () => {
 	});
 
 	// Filtrare utilizatori
-	// const filteredUsers = users.filter((user) => {
-	// 	return (
-	// 		!searchQuery ||
-	// 		user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-	// 		user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-	// 	);
-	// });
+	const filteredUsers = users.filter((user) => {
+		return (
+			!searchQuery ||
+			user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+	});
 
 	// Loading state
 	if (isLoading && !listings.length && !users.length) {
@@ -679,17 +679,27 @@ const AdminPage = () => {
 													<div className="flex items-center justify-end space-x-2">
 														<button
 															onClick={() => handleViewListing(listing.id)}
+															disabled={isProcessing[listing.id]}
 															className="text-gray-600 hover:text-gray-900"
 															title="Vezi anunțul"
 														>
-															<Eye className="h-5 w-5" />
+															{isProcessing[listing.id] ? (
+																<div className="h-5 w-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+															) : (
+																<Eye className="h-5 w-5" />
+															)}
 														</button>
 														<button
 															onClick={() => handleEditListing(listing.id)}
+															disabled={isProcessing[listing.id]}
 															className="text-blue-600 hover:text-blue-800"
 															title="Editează anunțul"
 														>
-															<Edit className="h-5 w-5" />
+															{isProcessing[listing.id] ? (
+																<div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+															) : (
+																<Edit className="h-5 w-5" />
+															)}
 														</button>
 														<button
 															onClick={() => handleDeleteListing(listing.id)}
