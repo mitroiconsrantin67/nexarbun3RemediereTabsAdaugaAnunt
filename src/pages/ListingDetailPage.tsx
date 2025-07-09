@@ -505,11 +505,7 @@ const ListingDetailPage = () => {
 								<div className="mb-4 flex justify-start">
 									<div
 										className={`inline-flex items-center space-x-2 px-4 py-2 rounded-lg ${
-											listing.availability === "pe_stoc"
-												? "bg-green-100 text-green-800 border border-green-200"
-												: "bg-blue-100 text-blue-800 border border-blue-200"
-										}`}
-									>
+									<button onClick={handleShare} className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors" title="Distribuie anunțul">
 										{listing.availability === "pe_stoc" ? (
 											<>
 												<Store className="h-4 w-4" />
