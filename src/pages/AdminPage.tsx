@@ -687,7 +687,7 @@ const AdminPage = () => {
 														<button
 															onClick={() => handleViewListing(listing.id)}
 															disabled={isProcessing[listing.id]}
-															className="text-gray-600 hover:text-gray-900 disabled:opacity-50"
+															className="text-gray-600 hover:text-gray-900 disabled:opacity-50 cursor-pointer"
 															title="Vezi anunțul"
 														>
 															{isProcessing[listing.id] ? (
@@ -699,7 +699,7 @@ const AdminPage = () => {
 														<button
 															onClick={() => handleEditListing(listing.id)}
 															disabled={isProcessing[listing.id]}
-															className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
+															className="text-blue-600 hover:text-blue-800 disabled:opacity-50 cursor-pointer"
 															title="Editează anunțul"
 														>
 															{isProcessing[listing.id] ? (
@@ -711,7 +711,7 @@ const AdminPage = () => {
 														<button
 															onClick={() => handleDeleteListing(listing.id)}
 															disabled={isProcessing[listing.id]}
-															className="text-red-600 hover:text-red-800 disabled:opacity-50"
+															className="text-red-600 hover:text-red-800 disabled:opacity-50 cursor-pointer"
 															title="Șterge anunțul"
 														>
 															{isProcessing[listing.id] ? (
