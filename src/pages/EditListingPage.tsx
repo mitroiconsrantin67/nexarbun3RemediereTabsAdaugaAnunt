@@ -57,7 +57,6 @@ const EditListingPage = () => {
     price: '',
     mileage: '',
     engine_capacity: '',
-    power: '',
     fuel_type: '',
     transmission: '',
     color: '',
@@ -93,7 +92,6 @@ const EditListingPage = () => {
           price: data.price?.toString() || '',
           mileage: data.mileage?.toString() || '',
           engine_capacity: data.engine_capacity?.toString() || '',
-          power: data.power?.toString() || '',
           fuel_type: data.fuel_type || '',
           transmission: data.transmission || '',
           color: data.color || '',
@@ -191,7 +189,6 @@ const EditListingPage = () => {
           price: parseFloat(formData.price),
           mileage: parseInt(formData.mileage),
           engine_capacity: parseInt(formData.engine_capacity),
-          power: parseInt(formData.power),
           fuel_type: formData.fuel_type,
           transmission: formData.transmission,
           color: formData.color,
@@ -335,20 +332,6 @@ const EditListingPage = () => {
                   type="number"
                   name="engine_capacity"
                   value={formData.engine_capacity}
-                  onChange={handleInputChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Putere (CP)
-                </label>
-                <input
-                  type="number"
-                  name="power"
-                  value={formData.power}
                   onChange={handleInputChange}
                   min="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
