@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bike, Upload, X, AlertTriangle, Check, MapPin, Calendar, Gauge, Fuel, Settings, FileText, Euro, Camera, Plus, Minus } from 'lucide-react';
 import { listings, auth, romanianCities } from '../lib/supabase';
+import SuccessModal from '../components/SuccessModal';
 
 interface FormData {
 	title: string;
@@ -33,6 +34,8 @@ const CreateListingPage: React.FC = () => {
 	const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const [createdListingId, setCreatedListingId] = useState<string | null>(null);
 
 	const [formData, setFormData] = useState<FormData>({
 		title: '',
@@ -80,17 +83,14 @@ const CreateListingPage: React.FC = () => {
 
 	const fuelTypes = [
 		{ value: 'benzina', label: 'Benzină' },
-		{ value: 'motorina', label: 'Motorină' },
-		{ value: 'hibrid', label: 'Hibrid' },
 		{ value: 'electric', label: 'Electric' },
-		{ value: 'gpl', label: 'GPL' },
-		{ value: 'cng', label: 'CNG' }
+		{ value: 'hibrid', label: 'Hibrid' }
 	];
 
 	const transmissionTypes = [
 		{ value: 'manuala', label: 'Manuală' },
 		{ value: 'automata', label: 'Automată' },
-		{ value: 'cvt', label: 'CVT' }
+		{ value: 'semi-automata', label: 'Semi-automată' }
 	];
 
 	const conditionTypes = [
@@ -252,13 +252,28 @@ const CreateListingPage: React.FC = () => {
 				throw error;
 			}
 
-			// Redirecționăm către pagina de anunțuri cu un mesaj de succes
-			navigate('/listings?success=created');
+			console.log("Listing created successfully:", data.id);
+			setCreatedListingId(data.id);
+			setShowSuccessModal(true);
 		} catch (error: any) {
 			console.error('Error creating listing:', error);
 			alert(error.message || 'A apărut o eroare la crearea anunțului');
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const handleCloseSuccessModal = () => {
+		setShowSuccessModal(false);
+	};
+
+	const handleGoHome = () => {
+		navigate('/');
+	};
+
+	const handleViewListing = () => {
+		if (createdListingId) {
+			navigate(`/anunt/${createdListingId}`);
 		}
 	};
 
@@ -307,7 +322,7 @@ const CreateListingPage: React.FC = () => {
 										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 											errors.title ? 'border-red-500' : 'border-gray-300'
 										}`}
-										placeholder="ex: BMW X5 2020, stare impecabilă"
+										placeholder="ex: BMW S1000RR 2020, stare impecabilă"
 									/>
 									{errors.title && (
 										<p className="mt-1 text-sm text-red-600 flex items-center">
@@ -447,7 +462,7 @@ const CreateListingPage: React.FC = () => {
 										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 											errors.model ? 'border-red-500' : 'border-gray-300'
 										}`}
-										placeholder="ex: X5"
+										placeholder="ex: S1000RR"
 									/>
 									{errors.model && (
 										<p className="mt-1 text-sm text-red-600 flex items-center">
@@ -659,7 +674,7 @@ const CreateListingPage: React.FC = () => {
 									className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 										errors.description ? 'border-red-500' : 'border-gray-300'
 									}`}
-									placeholder="Descrie vehiculul în detaliu: starea tehnică, dotările, istoricul, etc."
+									placeholder="Descrie motocicleta în detaliu: starea tehnică, dotările, istoricul, etc."
 								/>
 								{errors.description && (
 									<p className="mt-1 text-sm text-red-600 flex items-center">
@@ -736,7 +751,7 @@ const CreateListingPage: React.FC = () => {
 						<div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
 							<button
 								type="button"
-								onClick={() => navigate('/listings')}
+								onClick={() => navigate('/')}
 								className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
 							>
 								Anulează
@@ -762,6 +777,19 @@ const CreateListingPage: React.FC = () => {
 					</form>
 				</div>
 			</div>
+
+			{/* Success Modal */}
+			{showSuccessModal && (
+				<SuccessModal
+					isOpen={showSuccessModal}
+					onClose={handleCloseSuccessModal}
+					onGoHome={handleGoHome}
+					onViewListing={handleViewListing}
+					title="Felicitări!"
+					message="Anunțul tău a fost trimis spre aprobare. Va fi publicat după ce va fi revizuit de echipa noastră."
+					showViewButton={!!createdListingId}
+				/>
+			)}
 		</div>
 	);
 };
