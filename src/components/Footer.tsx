@@ -150,18 +150,20 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <a href="tel:0790454647" className="flex items-center space-x-3 text-gray-300 hover:text-white transition-colors">
                   <Phone className="h-4 w-4 text-nexar-accent" />
-                  <span className="text-sm">0790 454 647</span>
+                  <span className="text-sm hover:underline">0790 454 647</span>
                 </a>
               </div>
               <div className="flex items-center space-x-3">
                 <a href="mailto:contact@nexar.ro" className="flex items-center space-x-3 text-gray-300 hover:text-white transition-colors">
                   <Mail className="h-4 w-4 text-nexar-accent" />
-                  <span className="text-sm">contact@nexar.ro</span>
+                  <span className="text-sm hover:underline">contact@nexar.ro</span>
                 </a>
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin className="h-4 w-4 text-nexar-accent mt-0.5" />
-                <span className="text-gray-300 text-sm">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</span>
+                <a href="https://maps.google.com/?q=Bulevardul+Dem+Radulescu+24,+Râmnicu+Vâlcea" target="_blank" rel="noopener noreferrer" className="flex items-start space-x-3 text-gray-300 hover:text-white transition-colors group">
+                  <MapPin className="h-4 w-4 text-nexar-accent mt-0.5" />
+                  <span className="text-sm hover:underline">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</span>
+                </a>
               </div>
               <div className="flex items-start space-x-3">
                 <Clock className="h-4 w-4 text-nexar-accent mt-0.5" />
