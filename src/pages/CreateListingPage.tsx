@@ -1,4 +1,4 @@
-Here's the fixed version with all missing closing brackets added:
+Here's the fixed script with the missing closing brackets:
 
 ```javascript
 import React, { useState, useEffect, useRef } from "react";
@@ -443,148 +443,145 @@ const CreateListingPage = () => {
 	const handleSubmit = async () => {
 		if (!validateStep(4)) return;
 
-		// Setăm flag-ul pentru a preveni reîncărcarea
+		// Verificăm dacă procesul nu a fost deja inițiat
+		if (sessionStorage.getItem('submissionInProgress') === 'true') {
+			console.log('🚫 Submission already in progress, preventing duplicate');
+			return;
+		}
+
+		// Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
 		sessionStorage.setItem('isSubmittingListing', 'true');
+		sessionStorage.setItem('submissionInProgress', 'true');
 		setIsSubmitting(true);
 
 		try {
-			// Verificăm din nou dacă procesul nu a fost deja inițiat
-			if (sessionStorage.getItem('submissionInProgress') === 'true') {
-				console.log('🚫 Submission already in progress, preventing duplicate');
-				return;
+			if (!userProfile) {
+				throw new Error("Profilul utilizatorului nu a fost găsit");
 			}
 
-			// Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
-			sessionStorage.setItem('isSubmittingListing', 'true');
-			sessionStorage.setItem('submissionInProgress', 'true');
-			setIsSubmitting(true);
+			const { data: authUser, error: authError } =
+				await supabase.auth.getUser();
 
+			if (authError || !authUser) {
+				console.error(
+					"❌ Eroare la obținerea utilizatorului curent:",
+					authError,
+				);
+				throw new Error("Utilizatorul nu este autentificat");
+			}
+
+			console.log("🔐 UID din auth:", authUser.user.id);
+			console.log("🆔 seller_id din profil (user_id):", userProfile.user_id); // Log the correct user_id
+			console.log("🆔 id-ul profilului (id):", userProfile.id); // Log the profile id
+
+			if (userProfile.user_id !== authUser.user.id) {
+				console.error("🚫 Mismatch între userProfile.user_id și auth.uid()");
+				throw new Error("UID mismatch: seller_id diferit de auth.uid()");
+			}
+
+			console.log("🚀 Starting listing creation...");
+			console.log("📋 Form data before mapping:", formData);
+
+			// Pregătim datele pentru anunț cu maparea corectă
+			const listingData = {
+				title: formData.title.trim(),
+				description: formData.description.trim() || "",
+				price: parseFloat(formData.price),
+				year: parseInt(formData.year),
+				mileage: parseInt(formData.mileage),
+				location: formData.location.trim(),
+				category: mapValueForDatabase("category", formData.category),
+				brand: formData.brand,
+				model: formData.model.trim(),
+				engine_capacity: parseInt(formData.engine),
+				fuel_type: mapValueForDatabase("fuel", formData.fuel),
+				transmission: mapValueForDatabase(
+					"transmission",
+					formData.transmission,
+				),
+				condition: mapValueForDatabase("condition", formData.condition),
+				color: formData.color.trim(),
+				features: formData.features,
+				seller_id: userProfile.id, // AICI ESTE CORECȚIA: Folosește userProfile.user_id
+				seller_name: userProfile.name || "Utilizator",
+				seller_type: userProfile.seller_type,
+				status: "pending",
+				availability: availabilityValue,
+			};
+
+			console.log("availability:", listingData.availability);
+			console.log("📝 Mapped listing data:", listingData);
+
+			// Trimitem anunțul și imaginile la server
+			console.log(
+				"📤 Trimit date către listings.create:",
+				listingData,
+				imageFiles,
+			);
+			console.log("🔥 seller_id înainte de inserție:", listingData.seller_id);
+			console.log("🔐 authUser.user.id înainte de inserție:", authUser.user.id);
+			console.log("🔎 seller_id TRIMIS (corectat):", listingData.seller_id);
+
+			const result = await listings.create(listingData, imageFiles);
+			console.log("📬 Răspuns complet listings.create:", result);
+
+			const { data, error } = result;
+			console.log("📬 Răspuns de la server:", data, error);
+
+			if (error) {
+				console.error("❌ Error creating listing:", error);
+				throw new Error(error.message || "Eroare la crearea anunțului");
+			}
+
+			console.log("✅ Listing created successfully:", data);
+
+			setCreatedListingId(data.id);
+			
+			// Curățăm flag-ul de submission în curs
+			sessionStorage.removeItem('submissionInProgress');
+			
+			setShowSuccessModal(true);
+		} catch (error: any) {
+			console.error("💥 Error creating listing:", error);
+
+			// Afișează alert la client
+			alert(
+				"Eroare la trimiterea anunțului: " + (error.message || "necunoscută"),
+			);
+
+			// Salvează eroarea în tabelul 'error_logs' (dacă e autentificat)
 			try {
-				if (!userProfile) {
-					throw new Error("Profilul utilizatorului nu a fost găsit");
+				const { data: authUser } = await supabase.auth.getUser();
+				if (authUser?.user?.id) {
+					await supabase.from("error_logs").insert([
+						{
+							user_id: authUser.user.id,
+							message: error.message || "Eroare necunoscută",
+							full_error: JSON.stringify(error),
+							created_at: new Date().toISOString(),
+						},
+					]);
+					console.log("✅ Eroarea a fost salvată în Supabase");
 				}
-
-				const { data: authUser, error: authError } =
-					await supabase.auth.getUser();
-
-				if (authError || !authUser) {
-					console.error(
-						"❌ Eroare la obținerea utilizatorului curent:",
-						authError,
-					);
-					throw new Error("Utilizatorul nu este autentificat");
-				}
-
-				console.log("🔐 UID din auth:", authUser.user.id);
-				console.log("🆔 seller_id din profil (user_id):", userProfile.user_id); // Log the correct user_id
-				console.log("🆔 id-ul profilului (id):", userProfile.id); // Log the profile id
-
-				if (userProfile.user_id !== authUser.user.id) {
-					console.error("🚫 Mismatch între userProfile.user_id și auth.uid()");
-					throw new Error("UID mismatch: seller_id diferit de auth.uid()");
-				}
-
-				console.log("🚀 Starting listing creation...");
-				console.log("📋 Form data before mapping:", formData);
-
-				// Pregătim datele pentru anunț cu maparea corectă
-				const listingData = {
-					title: formData.title.trim(),
-					description: formData.description.trim() || "",
-					price: parseFloat(formData.price),
-					year: parseInt(formData.year),
-					mileage: parseInt(formData.mileage),
-					location: formData.location.trim(),
-					category: mapValueForDatabase("category", formData.category),
-					brand: formData.brand,
-					model: formData.model.trim(),
-					engine_capacity: parseInt(formData.engine),
-					fuel_type: mapValueForDatabase("fuel", formData.fuel),
-					transmission: mapValueForDatabase(
-						"transmission",
-						formData.transmission,
-					),
-					condition: mapValueForDatabase("condition", formData.condition),
-					color: formData.color.trim(),
-					features: formData.features,
-					seller_id: userProfile.id, // AICI ESTE CORECȚIA: Folosește userProfile.user_id
-					seller_name: userProfile.name || "Utilizator",
-					seller_type: userProfile.seller_type,
-					status: "pending",
-					availability: availabilityValue,
-				};
-
-				console.log("availability:", listingData.availability);
-				console.log("📝 Mapped listing data:", listingData);
-
-				// Trimitem anunțul și imaginile la server
-				console.log(
-					"📤 Trimit date către listings.create:",
-					listingData,
-					imageFiles,
-				);
-				console.log("🔥 seller_id înainte de inserție:", listingData.seller_id);
-				console.log("🔐 authUser.user.id înainte de inserție:", authUser.user.id);
-				console.log("🔎 seller_id TRIMIS (corectat):", listingData.seller_id);
-
-				const result = await listings.create(listingData, imageFiles);
-				console.log("📬 Răspuns complet listings.create:", result);
-
-				const { data, error } = result;
-				console.log("📬 Răspuns de la server:", data, error);
-
-				if (error) {
-					console.error("❌ Error creating listing:", error);
-					throw new Error(error.message || "Eroare la crearea anunțului");
-				}
-
-				console.log("✅ Listing created successfully:", data);
-
-				setCreatedListingId(data.id);
-				setShowSuccessModal(true);
-			} catch (error: any) {
-				console.error("💥 Error creating listing:", error);
-
-				// Afișează alert la client
-				alert(
-					"Eroare la trimiterea anunțului: " + (error.message || "necunoscută"),
-				);
-
-				// Salvează eroarea în tabelul 'error_logs' (dacă e autentificat)
-				try {
-					const { data: authUser } = await supabase.auth.getUser();
-					if (authUser?.user?.id) {
-						await supabase.from("error_logs").insert([
-							{
-								user_id: authUser.user.id,
-								message: error.message || "Eroare necunoscută",
-								full_error: JSON.stringify(error),
-								created_at: new Date().toISOString(),
-							},
-						]);
-						console.log("✅ Eroarea a fost salvată în Supabase");
-					}
-				} catch (logError) {
-					console.warn("❗ Nu am putut salva eroarea în Supabase:", logError);
-				}
-
-				// Afișează în pagină mesajul complet
-				setErrors({
-					submit:
-						"Detalii tehnice: " +
-						JSON.stringify(error, null, 2) +
-						"\nMesaj: " +
-						(error.message ||
-							"A apărut o eroare necunoscută la publicarea anunțului."),
-				});
-			} finally {
-				// Curățăm flag-ul și resetăm starea
-				sessionStorage.removeItem('isSubmittingListing');
-				setIsSubmitting(false);
+			} catch (logError) {
+				console.warn("❗ Nu am putut salva eroarea în Supabase:", logError);
 			}
+
+			// Afișează în pagină mesajul complet
+			setErrors({
+				submit:
+					"Detalii tehnice: " +
+					JSON.stringify(error, null, 2) +
+					"\nMesaj: " +
+					(error.message ||
+						"A apărut o eroare necunoscută la publicarea anunțului."),
+			});
 		} finally {
 			// Curățăm flag-ul și resetăm starea
 			sessionStorage.removeItem('isSubmittingListing');
+			if (sessionStorage.getItem('submissionInProgress') === 'true') {
+				sessionStorage.removeItem('submissionInProgress');
+			}
 			setIsSubmitting(false);
 		}
 	};
@@ -828,4 +825,4 @@ const CreateListingPage = () => {
 										type="number"
 										value={formData.year}
 										onChange={(e) => handleInputChange("year", e.target.value)}
-										className={
+										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-
