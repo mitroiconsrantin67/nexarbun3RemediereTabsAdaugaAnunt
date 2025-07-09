@@ -1,39 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
-// Singleton pentru a preveni multiple instanțe GoTrueClient
-let supabaseInstance: any = null;
-
 const supabaseUrl = "https://tidnmzsivsthwwcfdzyo.supabase.co";
 const supabaseAnonKey =
 	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpZG5tenNpdnN0aHd3Y2ZkenlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MjE5NTgsImV4cCI6MjA2NjI5Nzk1OH0.Sr1gSZ2qtoff7gmulkT8uIzB8eL7gqKUUNVj82OqHog";
 
-const createSupabaseClient = () => {
-	if (supabaseInstance) {
-		return supabaseInstance;
-	}
-
-	console.log('🔄 Creating new Supabase client instance');
-	supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-		auth: {
-			autoRefreshToken: true,
-			persistSession: true,
-			detectSessionInUrl: true,
-			flowType: "pkce",
-			// Prevenim multiple instanțe cu același storage key
-			storageKey: 'nexar-auth-token',
-		},
-		global: {
-			headers: {
-				'X-Client-Info': 'nexar-app'
-			}
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+	auth: {
+		autoRefreshToken: true,
+		persistSession: true,
+		detectSessionInUrl: true,
+		flowType: "pkce",
+		storageKey: 'nexar-auth-token',
+	},
+	global: {
+		headers: {
+			'X-Client-Info': 'nexar-app'
 		}
-	});
-
-	return supabaseInstance;
-};
-
-export const supabase = createSupabaseClient();
+	}
+});
 
 // Tipuri pentru baza de date
 export interface Listing {
