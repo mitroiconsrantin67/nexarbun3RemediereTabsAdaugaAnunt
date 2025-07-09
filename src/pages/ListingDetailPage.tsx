@@ -206,6 +206,38 @@ const ListingDetailPage = () => {
 		);
 	};
 
+	const handleShare = async () => {
+		const shareData = {
+			title: listing.title,
+			text: `Verifică această motocicletă: ${listing.brand} ${listing.model} - ${listing.price}`,
+			url: window.location.href
+		};
+
+		try {
+			// Verificăm dacă browser-ul suportă Web Share API
+			if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+				await navigator.share(shareData);
+			} else {
+				// Fallback: copiază link-ul în clipboard
+				await navigator.clipboard.writeText(window.location.href);
+				
+				// Afișăm o notificare temporară
+				const notification = document.createElement('div');
+				notification.textContent = 'Link copiat în clipboard!';
+				notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-up';
+				document.body.appendChild(notification);
+				
+				setTimeout(() => {
+					document.body.removeChild(notification);
+				}, 3000);
+			}
+		} catch (error) {
+			console.error('Error sharing:', error);
+			// Fallback final: deschide dialog-ul de share nativ al browser-ului
+			const shareUrl = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
+			window.open(shareUrl);
+		}
+	};
 	const openGoogleMaps = () => {
 		if (!listing) return;
 
@@ -340,7 +372,11 @@ const ListingDetailPage = () => {
 								)}
 
 								<div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex space-x-2">
-									<button className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors">
+									<button 
+										onClick={handleShare}
+										className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors"
+										title="Distribuie anunțul"
+									>
 										<Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
 									</button>
 								</div>

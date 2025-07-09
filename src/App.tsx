@@ -41,6 +41,16 @@ function useAppVisibility() {
 
 	useEffect(() => {
 		const handleReload = () => {
+			// Verificăm dacă există procese critice în desfășurare
+			const isSubmitting = sessionStorage.getItem('isSubmittingListing') === 'true';
+			const isProcessingPayment = sessionStorage.getItem('isProcessingPayment') === 'true';
+			
+			// Nu reîncărcăm dacă sunt procese critice active
+			if (isSubmitting || isProcessingPayment) {
+				console.log('🚫 Reload prevented - critical process in progress');
+				return;
+			}
+			
 			if (
 				location.pathname === "/" ||
 				location.pathname.startsWith("/profil") ||

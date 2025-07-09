@@ -43,10 +43,31 @@ const EditListingPage = () => {
     status: '',
     availability: 'pe_stoc'
   });
-
-  const availabilityOptions = [
-    { value: "pe_stoc", label: "Pe stoc", icon: Store },
-    { value: "la_comanda", label: "La comandă", icon: Clock },
+    "ABS (sistem antiblocare frâne)",
+    "Mansoane încălzite (TCS)",
+    "Parbriz",
+    "Șa încălzită",
+    "Mansoane încălzite",
+    "Pilot automat",
+    "Priză USB/12V",
+    "Genți laterale",
+    "Topcase",
+    "Crash bar",
+    "Suport telefon",
+    "Navigație",
+    "Bluetooth",
+    "Sistem audio",
+    "Keyless start",
+    "Quickshifter/blipper",
+    "TPMS",
+    "Antifurt",
+    "Imobilizator",
+    "Evacuare sport",
+    "Kit LED / DRL-uri personalizate",
+    "Handguards (apărători mâini)",
+    "Crash pads / frame sliders",
+    "Bare protecție motor",
+    "Scărițe reglabile"
   ];
 
   useEffect(() => {
@@ -403,6 +424,8 @@ const EditListingPage = () => {
     
     if (!validateForm()) return;
     
+    // Setăm flag-ul pentru a preveni reîncărcarea
+    sessionStorage.setItem('isSubmittingListing', 'true');
     setIsSubmitting(true);
     
     try {
@@ -424,8 +447,8 @@ const EditListingPage = () => {
         color: formData.color.trim(),
         features: formData.features,
         updated_at: new Date().toISOString(),
-        // Dacă este admin, păstrăm statusul selectat, altfel setăm la pending
-        status: isAdmin ? formData.status : 'pending',
+        // TOATE editările merg la pending pentru aprobare
+        status: 'pending',
         // Adăugăm disponibilitatea doar pentru dealeri
         availability: originalListing.seller_type === 'dealer' ? formData.availability : 'pe_stoc'
       };
@@ -448,6 +471,8 @@ const EditListingPage = () => {
       console.error('Error updating listing:', error);
       alert('Eroare la actualizarea anunțului: ' + error.message);
     } finally {
+      // Curățăm flag-ul și resetăm starea
+      sessionStorage.removeItem('isSubmittingListing');
       setIsSubmitting(false);
     }
   };

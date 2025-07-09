@@ -177,22 +177,31 @@ const CreateListingPage = () => {
 	];
 
 	const availableFeatures = [
-		"ABS",
-		"Control tracțiune",
-		"Suspensie reglabilă",
-		"Frâne Brembo",
-		"Quickshifter",
-		"Sistem de navigație",
-		"Încălzire mânere",
-		"LED complet",
+		"ABS (sistem antiblocare frâne)",
+		"Mansoane încălzite (TCS)",
+		"Parbriz",
+		"Șa încălzită",
+		"Mansoane încălzite",
+		"Pilot automat",
+		"Priză USB/12V",
+		"Genți laterale",
+		"Topcase",
+		"Crash bar",
+		"Suport telefon",
+		"Navigație",
 		"Bluetooth",
-		"USB",
-		"Geantă laterală",
-		"Parbriz reglabil",
-		"Scaun încălzit",
-		"Tempomat",
-		"Sistem anti-furt",
-		"Jante aliaj",
+		"Sistem audio",
+		"Keyless start",
+		"Quickshifter/blipper",
+		"TPMS",
+		"Antifurt",
+		"Imobilizator",
+		"Evacuare sport",
+		"Kit LED / DRL-uri personalizate",
+		"Handguards (apărători mâini)",
+		"Crash pads / frame sliders",
+		"Bare protecție motor",
+		"Scărițe reglabile",
 	];
 
 	// Mapare pentru valorile din baza de date
@@ -431,6 +440,8 @@ const CreateListingPage = () => {
 	const handleSubmit = async () => {
 		if (!validateStep(4)) return;
 
+		// Setăm flag-ul pentru a preveni reîncărcarea
+		sessionStorage.setItem('isSubmittingListing', 'true');
 		setIsSubmitting(true);
 
 		try {
@@ -552,6 +563,8 @@ const CreateListingPage = () => {
 						"A apărut o eroare necunoscută la publicarea anunțului."),
 			});
 		} finally {
+			// Curățăm flag-ul și resetăm starea
+			sessionStorage.removeItem('isSubmittingListing');
 			setIsSubmitting(false);
 		}
 	};
