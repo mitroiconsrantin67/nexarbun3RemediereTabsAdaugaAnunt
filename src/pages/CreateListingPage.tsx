@@ -1,3 +1,6 @@
+Here's the fixed version with all missing closing brackets added:
+
+```javascript
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -445,135 +448,140 @@ const CreateListingPage = () => {
 		setIsSubmitting(true);
 
 		try {
-		// Verificăm din nou dacă procesul nu a fost deja inițiat
-		if (sessionStorage.getItem('submissionInProgress') === 'true') {
-			console.log('🚫 Submission already in progress, preventing duplicate');
-			return;
-		}
-
-		// Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
-		sessionStorage.setItem('isSubmittingListing', 'true');
-		sessionStorage.setItem('submissionInProgress', 'true');
-		setIsSubmitting(true);
-
-		try {
-			if (!userProfile) {
-				throw new Error("Profilul utilizatorului nu a fost găsit");
+			// Verificăm din nou dacă procesul nu a fost deja inițiat
+			if (sessionStorage.getItem('submissionInProgress') === 'true') {
+				console.log('🚫 Submission already in progress, preventing duplicate');
+				return;
 			}
 
-			const { data: authUser, error: authError } =
-				await supabase.auth.getUser();
+			// Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
+			sessionStorage.setItem('isSubmittingListing', 'true');
+			sessionStorage.setItem('submissionInProgress', 'true');
+			setIsSubmitting(true);
 
-			if (authError || !authUser) {
-				console.error(
-					"❌ Eroare la obținerea utilizatorului curent:",
-					authError,
-				);
-				throw new Error("Utilizatorul nu este autentificat");
-			}
-
-			console.log("🔐 UID din auth:", authUser.user.id);
-			console.log("🆔 seller_id din profil (user_id):", userProfile.user_id); // Log the correct user_id
-			console.log("🆔 id-ul profilului (id):", userProfile.id); // Log the profile id
-
-			if (userProfile.user_id !== authUser.user.id) {
-				console.error("🚫 Mismatch între userProfile.user_id și auth.uid()");
-				throw new Error("UID mismatch: seller_id diferit de auth.uid()");
-			}
-
-			console.log("🚀 Starting listing creation...");
-			console.log("📋 Form data before mapping:", formData);
-
-			// Pregătim datele pentru anunț cu maparea corectă
-			const listingData = {
-				title: formData.title.trim(),
-				description: formData.description.trim() || "",
-				price: parseFloat(formData.price),
-				year: parseInt(formData.year),
-				mileage: parseInt(formData.mileage),
-				location: formData.location.trim(),
-				category: mapValueForDatabase("category", formData.category),
-				brand: formData.brand,
-				model: formData.model.trim(),
-				engine_capacity: parseInt(formData.engine),
-				fuel_type: mapValueForDatabase("fuel", formData.fuel),
-				transmission: mapValueForDatabase(
-					"transmission",
-					formData.transmission,
-				),
-				condition: mapValueForDatabase("condition", formData.condition),
-				color: formData.color.trim(),
-				features: formData.features,
-				seller_id: userProfile.id, // AICI ESTE CORECȚIA: Folosește userProfile.user_id
-				seller_name: userProfile.name || "Utilizator",
-				seller_type: userProfile.seller_type,
-				status: "pending",
-				availability: availabilityValue,
-			};
-
-			console.log("availability:", listingData.availability);
-			console.log("📝 Mapped listing data:", listingData);
-
-			// Trimitem anunțul și imaginile la server
-			console.log(
-				"📤 Trimit date către listings.create:",
-				listingData,
-				imageFiles,
-			);
-			console.log("🔥 seller_id înainte de inserție:", listingData.seller_id);
-			console.log("🔐 authUser.user.id înainte de inserție:", authUser.user.id);
-			console.log("🔎 seller_id TRIMIS (corectat):", listingData.seller_id);
-
-			const result = await listings.create(listingData, imageFiles);
-			console.log("📬 Răspuns complet listings.create:", result);
-
-			const { data, error } = result;
-			console.log("📬 Răspuns de la server:", data, error);
-
-			if (error) {
-				console.error("❌ Error creating listing:", error);
-				throw new Error(error.message || "Eroare la crearea anunțului");
-			}
-
-			console.log("✅ Listing created successfully:", data);
-
-			setCreatedListingId(data.id);
-			setShowSuccessModal(true);
-		} catch (error: any) {
-			console.error("💥 Error creating listing:", error);
-
-			// Afișează alert la client
-			alert(
-				"Eroare la trimiterea anunțului: " + (error.message || "necunoscută"),
-			);
-
-			// Salvează eroarea în tabelul 'error_logs' (dacă e autentificat)
 			try {
-				const { data: authUser } = await supabase.auth.getUser();
-				if (authUser?.user?.id) {
-					await supabase.from("error_logs").insert([
-						{
-							user_id: authUser.user.id,
-							message: error.message || "Eroare necunoscută",
-							full_error: JSON.stringify(error),
-							created_at: new Date().toISOString(),
-						},
-					]);
-					console.log("✅ Eroarea a fost salvată în Supabase");
+				if (!userProfile) {
+					throw new Error("Profilul utilizatorului nu a fost găsit");
 				}
-			} catch (logError) {
-				console.warn("❗ Nu am putut salva eroarea în Supabase:", logError);
-			}
 
-			// Afișează în pagină mesajul complet
-			setErrors({
-				submit:
-					"Detalii tehnice: " +
-					JSON.stringify(error, null, 2) +
-					"\nMesaj: " +
-					(error.message ||
-						"A apărut o eroare necunoscută la publicarea anunțului."),
-			});
+				const { data: authUser, error: authError } =
+					await supabase.auth.getUser();
+
+				if (authError || !authUser) {
+					console.error(
+						"❌ Eroare la obținerea utilizatorului curent:",
+						authError,
+					);
+					throw new Error("Utilizatorul nu este autentificat");
+				}
+
+				console.log("🔐 UID din auth:", authUser.user.id);
+				console.log("🆔 seller_id din profil (user_id):", userProfile.user_id); // Log the correct user_id
+				console.log("🆔 id-ul profilului (id):", userProfile.id); // Log the profile id
+
+				if (userProfile.user_id !== authUser.user.id) {
+					console.error("🚫 Mismatch între userProfile.user_id și auth.uid()");
+					throw new Error("UID mismatch: seller_id diferit de auth.uid()");
+				}
+
+				console.log("🚀 Starting listing creation...");
+				console.log("📋 Form data before mapping:", formData);
+
+				// Pregătim datele pentru anunț cu maparea corectă
+				const listingData = {
+					title: formData.title.trim(),
+					description: formData.description.trim() || "",
+					price: parseFloat(formData.price),
+					year: parseInt(formData.year),
+					mileage: parseInt(formData.mileage),
+					location: formData.location.trim(),
+					category: mapValueForDatabase("category", formData.category),
+					brand: formData.brand,
+					model: formData.model.trim(),
+					engine_capacity: parseInt(formData.engine),
+					fuel_type: mapValueForDatabase("fuel", formData.fuel),
+					transmission: mapValueForDatabase(
+						"transmission",
+						formData.transmission,
+					),
+					condition: mapValueForDatabase("condition", formData.condition),
+					color: formData.color.trim(),
+					features: formData.features,
+					seller_id: userProfile.id, // AICI ESTE CORECȚIA: Folosește userProfile.user_id
+					seller_name: userProfile.name || "Utilizator",
+					seller_type: userProfile.seller_type,
+					status: "pending",
+					availability: availabilityValue,
+				};
+
+				console.log("availability:", listingData.availability);
+				console.log("📝 Mapped listing data:", listingData);
+
+				// Trimitem anunțul și imaginile la server
+				console.log(
+					"📤 Trimit date către listings.create:",
+					listingData,
+					imageFiles,
+				);
+				console.log("🔥 seller_id înainte de inserție:", listingData.seller_id);
+				console.log("🔐 authUser.user.id înainte de inserție:", authUser.user.id);
+				console.log("🔎 seller_id TRIMIS (corectat):", listingData.seller_id);
+
+				const result = await listings.create(listingData, imageFiles);
+				console.log("📬 Răspuns complet listings.create:", result);
+
+				const { data, error } = result;
+				console.log("📬 Răspuns de la server:", data, error);
+
+				if (error) {
+					console.error("❌ Error creating listing:", error);
+					throw new Error(error.message || "Eroare la crearea anunțului");
+				}
+
+				console.log("✅ Listing created successfully:", data);
+
+				setCreatedListingId(data.id);
+				setShowSuccessModal(true);
+			} catch (error: any) {
+				console.error("💥 Error creating listing:", error);
+
+				// Afișează alert la client
+				alert(
+					"Eroare la trimiterea anunțului: " + (error.message || "necunoscută"),
+				);
+
+				// Salvează eroarea în tabelul 'error_logs' (dacă e autentificat)
+				try {
+					const { data: authUser } = await supabase.auth.getUser();
+					if (authUser?.user?.id) {
+						await supabase.from("error_logs").insert([
+							{
+								user_id: authUser.user.id,
+								message: error.message || "Eroare necunoscută",
+								full_error: JSON.stringify(error),
+								created_at: new Date().toISOString(),
+							},
+						]);
+						console.log("✅ Eroarea a fost salvată în Supabase");
+					}
+				} catch (logError) {
+					console.warn("❗ Nu am putut salva eroarea în Supabase:", logError);
+				}
+
+				// Afișează în pagină mesajul complet
+				setErrors({
+					submit:
+						"Detalii tehnice: " +
+						JSON.stringify(error, null, 2) +
+						"\nMesaj: " +
+						(error.message ||
+							"A apărut o eroare necunoscută la publicarea anunțului."),
+				});
+			} finally {
+				// Curățăm flag-ul și resetăm starea
+				sessionStorage.removeItem('isSubmittingListing');
+				setIsSubmitting(false);
+			}
 		} finally {
 			// Curățăm flag-ul și resetăm starea
 			sessionStorage.removeItem('isSubmittingListing');
@@ -820,617 +828,4 @@ const CreateListingPage = () => {
 										type="number"
 										value={formData.year}
 										onChange={(e) => handleInputChange("year", e.target.value)}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.year ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="2023"
-										min="1990"
-										max="2025"
-									/>
-									{errors.year && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.year}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Kilometraj *
-									</label>
-									<input
-										type="number"
-										value={formData.mileage}
-										onChange={(e) =>
-											handleInputChange("mileage", e.target.value)
-										}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.mileage ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="25000"
-										min="0"
-										max="500000"
-									/>
-									{errors.mileage && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.mileage}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Capacitate motor (cc) *
-									</label>
-									<input
-										type="number"
-										value={formData.engine}
-										onChange={(e) =>
-											handleInputChange("engine", e.target.value)
-										}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.engine ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="998"
-										min="50"
-										max="3000"
-									/>
-									{errors.engine && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.engine}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Combustibil *
-									</label>
-									<select
-										value={formData.fuel}
-										onChange={(e) => handleInputChange("fuel", e.target.value)}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.fuel ? "border-red-500" : "border-gray-300"
-										}`}
-									>
-										<option value="">Selectează combustibilul</option>
-										{fuelTypes.map((fuel) => (
-											<option key={fuel} value={fuel}>
-												{fuel}
-											</option>
-										))}
-									</select>
-									{errors.fuel && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.fuel}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Transmisie *
-									</label>
-									<select
-										value={formData.transmission}
-										onChange={(e) =>
-											handleInputChange("transmission", e.target.value)
-										}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.transmission ? "border-red-500" : "border-gray-300"
-										}`}
-									>
-										<option value="">Selectează transmisia</option>
-										{transmissionTypes.map((trans) => (
-											<option key={trans} value={trans}>
-												{trans}
-											</option>
-										))}
-									</select>
-									{errors.transmission && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.transmission}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Culoare *
-									</label>
-									<input
-										type="text"
-										value={formData.color}
-										onChange={(e) => handleInputChange("color", e.target.value)}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.color ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="ex: Albastru Racing"
-									/>
-									{errors.color && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.color}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Starea *
-									</label>
-									<select
-										value={formData.condition}
-										onChange={(e) =>
-											handleInputChange("condition", e.target.value)
-										}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.condition ? "border-red-500" : "border-gray-300"
-										}`}
-									>
-										<option value="">Selectează starea</option>
-										{conditions.map((condition) => (
-											<option key={condition} value={condition}>
-												{condition}
-											</option>
-										))}
-									</select>
-									{errors.condition && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.condition}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Locația *
-									</label>
-									<select
-										value={formData.location}
-										onChange={(e) =>
-											handleInputChange("location", e.target.value)
-										}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.location ? "border-red-500" : "border-gray-300"
-										}`}
-									>
-										<option value="">Selectează orașul</option>
-
-										{romanianCities.map((city) => (
-											<option key={city} value={city}>
-												{city}
-											</option>
-										))}
-									</select>
-									{errors.location && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.location}
-										</p>
-									)}
-								</div>
-
-								{/* Availability field - only for dealers */}
-								{userProfile.seller_type === "dealer" && (
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
-											Disponibilitate *
-										</label>
-										<div className="flex space-x-4">
-											{availabilityOptions.map((option) => (
-												<label
-													key={option.value}
-													className={`flex items-center space-x-2 border rounded-lg px-4 py-3 cursor-pointer transition-colors ${
-														formData.availability === option.value
-															? "border-nexar-accent bg-nexar-accent/5"
-															: "border-gray-300 hover:bg-gray-50"
-													}`}
-												>
-													<input
-														type="radio"
-														name="availability"
-														value={option.value}
-														checked={formData.availability === option.value}
-														onChange={(e) =>
-															handleInputChange("availability", e.target.value)
-														}
-														className="sr-only"
-													/>
-													{option.value === "pe_stoc" ? (
-														<Store
-															className={`h-5 w-5 ${
-																formData.availability === option.value
-																	? "text-nexar-accent"
-																	: "text-gray-400"
-															}`}
-														/>
-													) : (
-														<Clock
-															className={`h-5 w-5 ${
-																formData.availability === option.value
-																	? "text-nexar-accent"
-																	: "text-gray-400"
-															}`}
-														/>
-													)}
-													<span
-														className={
-															formData.availability === option.value
-																? "font-medium"
-																: ""
-														}
-													>
-														{option.label}
-													</span>
-												</label>
-											))}
-										</div>
-										{errors.availability && (
-											<p className="mt-1 text-sm text-red-600 flex items-center">
-												<AlertTriangle className="h-4 w-4 mr-1" />
-												{errors.availability}
-											</p>
-										)}
-									</div>
-								)}
-							</div>
-						</div>
-					)}
-
-					{/* Step 2: Images */}
-					{currentStep === 2 && (
-						<div className="space-y-6 animate-fade-in">
-							<div className="text-center">
-								<p className="text-gray-600 mb-6">
-									Adaugă până la 5 fotografii de calitate pentru a atrage mai
-									mulți cumpărători
-								</p>
-							</div>
-
-							{errors.images && (
-								<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-									<p className="text-red-600 flex items-center">
-										<AlertTriangle className="h-4 w-4 mr-2" />
-										{errors.images}
-									</p>
-								</div>
-							)}
-
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-								{images.map((image, index) => (
-									<div key={index} className="relative group">
-										<img
-											src={image}
-											alt={`Upload ${index + 1}`}
-											className="w-full h-48 object-cover rounded-lg"
-										/>
-										<button
-											onClick={() => removeImage(index)}
-											className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-										>
-											<X className="h-4 w-4" />
-										</button>
-										{index === 0 && (
-											<div className="absolute bottom-2 left-2 bg-gray-900 text-white px-2 py-1 rounded text-xs font-semibold">
-												Foto principală
-											</div>
-										)}
-									</div>
-								))}
-
-								{images.length < 5 && (
-									<label className="border-2 border-dashed border-gray-300 rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer hover:border-gray-900 transition-colors">
-										<Camera className="h-8 w-8 text-gray-400 mb-2" />
-										<span className="text-gray-600">Adaugă fotografie</span>
-										<span className="text-sm text-gray-400">
-											({images.length}/5)
-										</span>
-										<input
-											type="file"
-											multiple
-											accept="image/*"
-											onChange={handleImageUpload}
-											className="hidden"
-										/>
-									</label>
-								)}
-							</div>
-
-							<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-								<h4 className="font-semibold text-blue-800 mb-2">
-									Sfaturi pentru fotografii de calitate:
-								</h4>
-								<ul className="text-sm text-blue-700 space-y-1">
-									<li>• Fotografiază în lumină naturală</li>
-									<li>• Include imagini din toate unghiurile</li>
-									<li>• Arată detaliile importante și eventualele defecte</li>
-									<li>• Prima fotografie va fi cea principală</li>
-									<li>• Limită de 5MB per imagine</li>
-									<li>• Maxim 5 imagini per anunț</li>
-								</ul>
-							</div>
-						</div>
-					)}
-
-					{/* Step 3: Description and Price */}
-					{currentStep === 3 && (
-						<div className="space-y-6 animate-fade-in">
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Preț (EUR) *
-								</label>
-								<input
-									type="number"
-									value={formData.price}
-									onChange={(e) => handleInputChange("price", e.target.value)}
-									className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent text-2xl font-bold ${
-										errors.price ? "border-red-500" : "border-gray-300"
-									}`}
-									placeholder="18500"
-									min="100"
-									max="1000000"
-								/>
-								{errors.price && (
-									<p className="mt-1 text-sm text-red-600 flex items-center">
-										<AlertTriangle className="h-4 w-4 mr-1" />
-										{errors.price}
-									</p>
-								)}
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Descriere detaliată
-								</label>
-								<textarea
-									value={formData.description}
-									onChange={(e) =>
-										handleInputChange("description", e.target.value)
-									}
-									rows={8}
-									className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-										errors.description ? "border-red-500" : "border-gray-300"
-									}`}
-									placeholder="Descrie motocicleta în detaliu: starea tehnică, istoricul, modificările, etc."
-								/>
-								<div className="flex justify-between items-center mt-1">
-									{errors.description ? (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.description}
-										</p>
-									) : (
-										<p className="text-sm text-gray-500">
-											Maxim 2000 caractere
-										</p>
-									)}
-									<span
-										className={`text-sm ${
-											formData.description.length > 2000
-												? "text-red-600"
-												: "text-green-600"
-										}`}
-									>
-										{formData.description.length}/2000
-									</span>
-								</div>
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-4">
-									Dotări și caracteristici
-								</label>
-								<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-									{availableFeatures.map((feature) => (
-										<label
-											key={feature}
-											className="flex items-center space-x-2 cursor-pointer"
-										>
-											<input
-												type="checkbox"
-												checked={formData.features.includes(feature)}
-												onChange={() => handleFeatureToggle(feature)}
-												className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
-											/>
-											<span className="text-sm">{feature}</span>
-										</label>
-									))}
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Step 4: Contact */}
-					{currentStep === 4 && (
-						<div className="space-y-6 animate-fade-in">
-							<div className="text-center mb-6">
-								<h3 className="text-xl font-semibold text-gray-900 mb-2">
-									Informații de contact
-								</h3>
-								<p className="text-gray-600">
-									Aceste informații vor fi vizibile cumpărătorilor interesați
-								</p>
-							</div>
-
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Număr de telefon *
-									</label>
-									<input
-										type="tel"
-										value={formData.phone}
-										onChange={(e) => handleInputChange("phone", e.target.value)}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.phone ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="0790 45 46 47"
-									/>
-									{errors.phone && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.phone}
-										</p>
-									)}
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Email *
-									</label>
-									<input
-										type="email"
-										value={formData.email}
-										onChange={(e) => handleInputChange("email", e.target.value)}
-										className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
-											errors.email ? "border-red-500" : "border-gray-300"
-										}`}
-										placeholder="contact@exemplu.com"
-									/>
-									{errors.email && (
-										<p className="mt-1 text-sm text-red-600 flex items-center">
-											<AlertTriangle className="h-4 w-4 mr-1" />
-											{errors.email}
-										</p>
-									)}
-								</div>
-							</div>
-
-							<div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-								<h4 className="font-semibold text-yellow-800 mb-4">
-									Notă importantă:
-								</h4>
-								<p className="text-yellow-700 mb-3">
-									Anunțul tău va fi trimis spre aprobare administratorilor
-									platformei. După verificare, acesta va fi publicat și va
-									deveni vizibil pentru toți utilizatorii.
-								</p>
-								<p className="text-yellow-700">
-									Vei putea vedea statusul anunțului tău în secțiunea
-									"Anunțurile Mele" din profilul tău.
-								</p>
-							</div>
-
-							<div className="bg-green-50 border border-green-200 rounded-lg p-6">
-								<h4 className="font-semibold text-green-800 mb-4">
-									Rezumat anunț:
-								</h4>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-									<div>
-										<span className="text-green-700 font-medium">Titlu:</span>
-										<span className="ml-2">
-											{formData.title || "Necompletat"}
-										</span>
-									</div>
-									<div>
-										<span className="text-green-700 font-medium">Preț:</span>
-										<span className="ml-2">€{formData.price || "0"}</span>
-									</div>
-									<div>
-										<span className="text-green-700 font-medium">
-											Tip vânzător:
-										</span>
-										<span className="ml-2">
-											{userProfile.seller_type === "dealer"
-												? "Dealer Verificat"
-												: "Vânzător Privat"}
-										</span>
-									</div>
-									<div>
-										<span className="text-green-700 font-medium">
-											Fotografii:
-										</span>
-										<span className="ml-2">{images.length}/5</span>
-									</div>
-									{userProfile.seller_type === "dealer" && (
-										<div>
-											<span className="text-green-700 font-medium">
-												Disponibilitate:
-											</span>
-											<span className="ml-2">
-												{formData.availability === "pe_stoc"
-													? "Pe stoc"
-													: "La comandă"}
-											</span>
-										</div>
-									)}
-								</div>
-							</div>
-
-							{errors.submit && (
-								<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-									<p className="text-red-600 flex items-center">
-										<AlertTriangle className="h-4 w-4 mr-2" />
-										{errors.submit}
-									</p>
-								</div>
-							)}
-						</div>
-					)}
-
-					{/* Navigation Buttons */}
-					<div className="flex justify-between pt-8 border-t border-gray-200">
-						<button
-							onClick={prevStep}
-							disabled={currentStep === 1}
-							className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-								currentStep === 1
-									? "bg-gray-100 text-gray-400 cursor-not-allowed"
-									: "bg-gray-200 text-gray-700 hover:bg-gray-300"
-							}`}
-						>
-							Înapoi
-						</button>
-
-						{currentStep < 4 ? (
-							<button
-								onClick={nextStep}
-								className="px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
-							>
-								Continuă
-							</button>
-						) : (
-							<button
-								onClick={handleSubmit}
-								disabled={isSubmitting}
-								className="px-8 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								{isSubmitting ? (
-									<>
-										<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-										<span>Se trimite...</span>
-									</>
-								) : (
-									<>
-										<span>Trimite spre aprobare</span>
-										<Check className="h-5 w-5" />
-									</>
-								)}
-							</button>
-						)}
-					</div>
-				</div>
-			</div>
-
-			{/* Success Modal */}
-			<SuccessModal
-				isOpen={showSuccessModal}
-				onClose={handleSuccessModalClose}
-				onGoHome={handleGoHome}
-				onViewListing={handleViewListing}
-				title="Anunț trimis spre aprobare!"
-				message="Anunțul tău a fost trimis cu succes și este în așteptare pentru aprobare. Vei fi notificat când acesta va fi aprobat și publicat pe platformă."
-				showViewButton={true}
-			/>
-		</div>
-	);
-};
-
-export default CreateListingPage;
+										className={

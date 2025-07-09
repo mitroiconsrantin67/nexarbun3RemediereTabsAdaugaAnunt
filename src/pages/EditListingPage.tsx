@@ -174,8 +174,12 @@ const EditListingPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-
+    
+    // Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
+    sessionStorage.setItem('isSubmittingListing', 'true');
+    sessionStorage.setItem('submissionInProgress', 'true');
     setLoading(true);
+    
     try {
       const { error } = await supabase
         .from('listings')
@@ -193,18 +197,24 @@ const EditListingPage = () => {
           color: formData.color,
           availability: formData.availability,
           description: formData.description,
-          features: formData.features,
+          features: formData.features, 
           images: formData.images,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          status: "pending" // Setăm statusul la pending pentru a aștepta aprobarea
         })
         .eq('id', id);
 
       if (error) throw error;
 
       navigate(`/listing/${id}`);
+      
     } catch (error) {
       console.error('Error updating listing:', error);
+      alert('A apărut o eroare la actualizarea anunțului. Te rugăm să încerci din nou.');
     } finally {
+      // Curățăm flag-urile
+      sessionStorage.removeItem('isSubmittingListing');
+      sessionStorage.removeItem('submissionInProgress');
       setLoading(false);
     }
   };

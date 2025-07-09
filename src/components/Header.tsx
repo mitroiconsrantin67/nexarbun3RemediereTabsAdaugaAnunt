@@ -140,120 +140,122 @@ const Header = () => {
 			console.log("🔄 Auth state changed:", event, session?.user?.email);
 
 			if (event === "SIGNED_IN" && session?.user) {
-		// Listen for auth changes - cu debounce pentru a evita multiple apeluri
-		let authChangeTimeout: NodeJS.Timeout;
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange(async (event, session) => {
-			// Debounce pentru a evita multiple apeluri rapide
-			if (authChangeTimeout) {
-				clearTimeout(authChangeTimeout);
-			}
-
-			authChangeTimeout = setTimeout(async () => {
-				console.log("🔄 Auth state changed:", event, session?.user?.email);
-
-				if (event === "SIGNED_IN" && session?.user) {
-				// Verificăm dacă utilizatorul este admin
-				const isAdminUser = await admin.isAdmin();
-				setIsAdmin(isAdminUser);
-
-				// User signed in - get profile
-				const { data: profileData, error: profileError } = await supabase
-					.from("profiles")
-					.select("*")
-					.eq("user_id", session.user.id)
-					.single();
-
-				if (!profileError && profileData) {
-					const userData = {
-						id: session.user.id,
-						name: profileData.name,
-						email: profileData.email,
-						sellerType: profileData.seller_type,
-						isAdmin:
-							profileData.is_admin || session.user.email === "admin@nexar.ro",
-						isLoggedIn: true,
-					};
-
-					setUser(userData);
-					localStorage.setItem("user", JSON.stringify(userData));
-
-					// Redirect to home page after successful login
-					if (location.pathname === "/auth") {
-						navigate("/");
+				// Listen for auth changes - cu debounce pentru a evita multiple apeluri
+				let authChangeTimeout: NodeJS.Timeout;
+				const {
+					data: { subscription },
+				} = supabase.auth.onAuthStateChange(async (event, session) => {
+					// Debounce pentru a evita multiple apeluri rapide
+					if (authChangeTimeout) {
+						clearTimeout(authChangeTimeout);
 					}
-				} else {
-					// Creăm automat profilul lipsă
-					try {
-						const { data: newProfile } = await supabase
-							.from("profiles")
-							.insert([
-								{
-									user_id: session.user.id,
-									name: session.user.email?.split("@")[0] || "Utilizator",
-									email: session.user.email,
-									seller_type: "individual",
-									is_admin: session.user.email === "admin@nexar.ro",
-								},
-							])
-							.select()
-							.single();
 
-						if (newProfile) {
-							const userData = {
-								id: session.user.id,
-								name: newProfile.name,
-								email: newProfile.email,
-								sellerType: newProfile.seller_type,
-								isAdmin:
-									newProfile.is_admin ||
-									session.user.email === "admin@nexar.ro",
-								isLoggedIn: true,
-							};
+					authChangeTimeout = setTimeout(async () => {
+						console.log("🔄 Auth state changed:", event, session?.user?.email);
 
-							setUser(userData);
-							localStorage.setItem("user", JSON.stringify(userData));
+						if (event === "SIGNED_IN" && session?.user) {
+							// Verificăm dacă utilizatorul este admin
+							const isAdminUser = await admin.isAdmin();
+							setIsAdmin(isAdminUser);
 
-							// Redirect to home page after successful login
-							if (location.pathname === "/auth") {
-								navigate("/");
+							// User signed in - get profile
+							const { data: profileData, error: profileError } = await supabase
+								.from("profiles")
+								.select("*")
+								.eq("user_id", session.user.id)
+								.single();
+
+							if (!profileError && profileData) {
+								const userData = {
+									id: session.user.id,
+									name: profileData.name,
+									email: profileData.email,
+									sellerType: profileData.seller_type,
+									isAdmin:
+										profileData.is_admin || session.user.email === "admin@nexar.ro",
+									isLoggedIn: true,
+								};
+
+								setUser(userData);
+								localStorage.setItem("user", JSON.stringify(userData));
+
+								// Redirect to home page after successful login
+								if (location.pathname === "/auth") {
+									navigate("/");
+								}
+							} else {
+								// Creăm automat profilul lipsă
+								try {
+									const { data: newProfile } = await supabase
+										.from("profiles")
+										.insert([
+											{
+												user_id: session.user.id,
+												name: session.user.email?.split("@")[0] || "Utilizator",
+												email: session.user.email,
+												seller_type: "individual",
+												is_admin: session.user.email === "admin@nexar.ro",
+											},
+										])
+										.select()
+										.single();
+
+									if (newProfile) {
+										const userData = {
+											id: session.user.id,
+											name: newProfile.name,
+											email: newProfile.email,
+											sellerType: newProfile.seller_type,
+											isAdmin:
+												newProfile.is_admin ||
+												session.user.email === "admin@nexar.ro",
+											isLoggedIn: true,
+										};
+
+										setUser(userData);
+										localStorage.setItem("user", JSON.stringify(userData));
+
+										// Redirect to home page after successful login
+										if (location.pathname === "/auth") {
+											navigate("/");
+										}
+									} else {
+										setUser({
+											id: session.user.id,
+											email: session.user.email,
+											isAdmin: session.user.email === "admin@nexar.ro",
+											isLoggedIn: true,
+										});
+									}
+								} catch (profileCreateError) {
+									console.error("❌ Error creating profile:", profileCreateError);
+									setUser({
+										id: session.user.id,
+										email: session.user.email,
+										isAdmin: session.user.email === "admin@nexar.ro",
+										isLoggedIn: true,
+									});
+								}
 							}
-						} else {
-							setUser({
-								id: session.user.id,
-								email: session.user.email,
-								isAdmin: session.user.email === "admin@nexar.ro",
-								isLoggedIn: true,
-							});
+							setIsLoading(false);
+						} else if (event === "SIGNED_OUT") {
+							// User signed out
+							setUser(null);
+							setIsAdmin(false);
+							localStorage.removeItem("user");
+							setIsLoading(false);
 						}
-					} catch (profileCreateError) {
-						console.error("❌ Error creating profile:", profileCreateError);
-						setUser({
-							id: session.user.id,
-							email: session.user.email,
-							isAdmin: session.user.email === "admin@nexar.ro",
-							isLoggedIn: true,
-						});
-					}
-				}
-				setIsLoading(false);
-			} else if (event === "SIGNED_OUT") {
-				// User signed out
-				setUser(null);
-				setIsAdmin(false);
-				localStorage.removeItem("user");
-				setIsLoading(false);
-			}
-			}, 300); // Debounce de 300ms
-		});
+					}, 300); // Debounce de 300ms
+				});
 
-		return () => {
-			if (authChangeTimeout) {
-				clearTimeout(authChangeTimeout);
+				return () => {
+					if (authChangeTimeout) {
+						clearTimeout(authChangeTimeout);
+					}
+					subscription.unsubscribe();
+				};
 			}
-			subscription.unsubscribe();
-		};
+		});
 	};
 
 	const isActive = (path: string) => location.pathname === path;

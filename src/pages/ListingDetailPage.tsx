@@ -217,6 +217,7 @@ const ListingDetailPage = () => {
 			// Verificăm dacă browser-ul suportă Web Share API
 			if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
 				await navigator.share(shareData);
+				console.log('✅ Content shared successfully');
 			} else {
 				// Fallback: copiază link-ul în clipboard
 				await navigator.clipboard.writeText(window.location.href);
@@ -224,18 +225,26 @@ const ListingDetailPage = () => {
 				// Afișăm o notificare temporară
 				const notification = document.createElement('div');
 				notification.textContent = 'Link copiat în clipboard!';
-				notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-up';
+				notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
 				document.body.appendChild(notification);
 				
 				setTimeout(() => {
-					document.body.removeChild(notification);
+					notification.style.opacity = '0';
+					notification.style.transition = 'opacity 0.5s ease';
+					setTimeout(() => {
+						if (document.body.contains(notification)) {
+							document.body.removeChild(notification);
+						}
+					}, 500);
 				}, 3000);
+				console.log('✅ Link copied to clipboard');
 			}
 		} catch (error) {
 			console.error('Error sharing:', error);
 			// Fallback final: deschide dialog-ul de share nativ al browser-ului
 			const shareUrl = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
 			window.open(shareUrl);
+			console.log('⚠️ Using email fallback for sharing');
 		}
 	};
 	const openGoogleMaps = () => {
