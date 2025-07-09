@@ -217,16 +217,23 @@ const AdminPage = () => {
 	const handleDeleteListing = async (listingId: string) => {
 		if (!confirm("Ești sigur că vrei să ștergi acest anunț?")) return;
 
+		console.log("🗑️ Încercarea de a șterge anunțul:", listingId);
 		try {
 			setIsProcessing((prev) => ({ ...prev, [listingId]: true }));
 
-			const { error } = await admin.deleteListing(listingId);
+			// Folosim direct supabase pentru a șterge anunțul
+			const { error } = await supabase
+				.from("listings")
+				.delete()
+				.eq("id", listingId);
 
 			if (error) {
 				console.error("Error deleting listing:", error);
 				alert(`Eroare la ștergerea anunțului: ${error.message}`);
 				return;
 			}
+
+			console.log("✅ Anunțul a fost șters cu succes");
 
 			// Elimină anunțul din listă
 			setListings((prev) => prev.filter((listing) => listing.id !== listingId));
@@ -680,7 +687,7 @@ const AdminPage = () => {
 														<button
 															onClick={() => handleViewListing(listing.id)}
 															disabled={isProcessing[listing.id]}
-															className="text-gray-600 hover:text-gray-900"
+															className="text-gray-600 hover:text-gray-900 disabled:opacity-50"
 															title="Vezi anunțul"
 														>
 															{isProcessing[listing.id] ? (
@@ -692,7 +699,7 @@ const AdminPage = () => {
 														<button
 															onClick={() => handleEditListing(listing.id)}
 															disabled={isProcessing[listing.id]}
-															className="text-blue-600 hover:text-blue-800"
+															className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
 															title="Editează anunțul"
 														>
 															{isProcessing[listing.id] ? (
