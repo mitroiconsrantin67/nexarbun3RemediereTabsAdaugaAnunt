@@ -95,27 +95,33 @@ const ContactPage = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Informații de Contact</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 text-nexar-accent mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Adresă</h3>
-                    <p className="text-gray-700">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
-                  </div>
+                  <a href="https://maps.google.com/?q=Bulevardul+Dem+Radulescu+24,+Râmnicu+Vâlcea" target="_blank" rel="noopener noreferrer" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
+                    <MapPin className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Adresă</h3>
+                      <p className="text-gray-700">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
+                    </div>
+                  </a>
                 </div>
                 
                 <div className="flex items-start space-x-3">
-                  <Phone className="h-5 w-5 text-nexar-accent mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Telefon</h3>
-                    <p className="text-gray-700">0790 454 647</p>
-                  </div>
+                  <a href="tel:0790454647" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
+                    <Phone className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Telefon</h3>
+                      <p className="text-gray-700">0790 454 647</p>
+                    </div>
+                  </a>
                 </div>
                 
                 <div className="flex items-start space-x-3">
-                  <Mail className="h-5 w-5 text-nexar-accent mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Email</h3>
-                    <p className="text-gray-700">contact@nexar.ro</p>
-                  </div>
+                  <a href="mailto:contact@nexar.ro" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
+                    <Mail className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Email</h3>
+                      <p className="text-gray-700">contact@nexar.ro</p>
+                    </div>
+                  </a>
                 </div>
                 
                 <div className="flex items-start space-x-3">

@@ -441,14 +441,15 @@ const EditListingPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'opacity-50' : ''}`}>
                   Disponibilitate
                 </label>
                 <select
                   name="availability"
                   value={formData.availability}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${formData.seller_type !== 'dealer' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={formData.seller_type !== 'dealer'}
                 >
                   {availabilityOptions.map(option => (
                     <option key={option.value} value={option.value}>

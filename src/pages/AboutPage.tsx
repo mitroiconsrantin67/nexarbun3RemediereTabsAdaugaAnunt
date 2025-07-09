@@ -41,16 +41,22 @@ const AboutPage = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Contactează-ne</h3>
               <div className="space-y-2 text-gray-700">
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-5 w-5 text-nexar-accent" />
-                  <p><strong>Adresă:</strong> Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
+                  <a href="https://maps.google.com/?q=Bulevardul+Dem+Radulescu+24,+Râmnicu+Vâlcea" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:text-nexar-accent transition-colors">
+                    <MapPin className="h-5 w-5 text-nexar-accent" />
+                    <p><strong>Adresă:</strong> Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
+                  </a>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Phone className="h-5 w-5 text-nexar-accent" />
-                  <p><strong>Telefon:</strong> 0790 454 647</p>
+                  <a href="tel:0790454647" className="flex items-center space-x-2 hover:text-nexar-accent transition-colors">
+                    <Phone className="h-5 w-5 text-nexar-accent" />
+                    <p><strong>Telefon:</strong> 0790 454 647</p>
+                  </a>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-5 w-5 text-nexar-accent" />
-                  <p><strong>Email:</strong> contact@nexar.ro</p>
+                  <a href="mailto:contact@nexar.ro" className="flex items-center space-x-2 hover:text-nexar-accent transition-colors">
+                    <Mail className="h-5 w-5 text-nexar-accent" />
+                    <p><strong>Email:</strong> contact@nexar.ro</p>
+                  </a>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Clock className="h-5 w-5 text-nexar-accent" />

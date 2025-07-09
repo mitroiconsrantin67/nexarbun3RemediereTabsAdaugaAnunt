@@ -428,13 +428,14 @@ const CreateListingPage: React.FC = () => {
 								</div>
 
 								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
+									<label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'opacity-50' : ''}`}>
 										Disponibilitate
 									</label>
 									<select
 										value={formData.availability}
 										onChange={(e) => handleInputChange('availability', e.target.value as 'pe_stoc' | 'la_comanda')}
-										className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+										className={`w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${formData.seller_type !== 'dealer' ? 'opacity-50 cursor-not-allowed' : ''}`}
+										disabled={formData.seller_type !== 'dealer'}
 									>
 										{availabilityTypes.map(type => (
 											<option key={type.value} value={type.value}>

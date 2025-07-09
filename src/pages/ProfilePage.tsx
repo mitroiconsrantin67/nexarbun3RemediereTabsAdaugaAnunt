@@ -534,10 +534,10 @@ const ProfilePage = () => {
 									<div className="mt-2">
 										{profile.seller_type === "dealer" ? (
 											<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5 rounded-full shadow-md border border-emerald-400">
-												<Building className="h-3 w-3" />
-												<span className="font-bold text-xs tracking-wide">
-													DEALER PREMIUM
-												</span>
+											  <Building className="h-3 w-3" />
+											  <span className="font-bold text-xs tracking-wide">
+												DEALER VERIFICAT
+											  </span>
 											</div>
 										) : (
 											<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-slate-500 to-slate-600 text-white px-3 py-1.5 rounded-full shadow-md">
@@ -715,17 +715,24 @@ const ProfilePage = () => {
 
 										{profile.phone && (
 											<div className="flex items-center space-x-3">
-												<Phone className="h-5 w-5 text-gray-400" />
-												<span className="text-gray-700">{profile.phone}</span>
+												<a href={`tel:${profile.phone}`} className="flex items-center space-x-3 text-gray-700 hover:text-nexar-accent transition-colors">
+													<Phone className="h-5 w-5 text-gray-400" />
+													<span>{profile.phone}</span>
+												</a>
 											</div>
 										)}
 
 										{profile.location && (
 											<div className="flex items-center space-x-3">
-												<MapPin className="h-5 w-5 text-gray-400" />
-												<span className="text-gray-700">
-													{profile.location}
-												</span>
+												<a 
+													href={`https://maps.google.com/?q=${encodeURIComponent(profile.location)}`} 
+													target="_blank" 
+													rel="noopener noreferrer" 
+													className="flex items-center space-x-3 text-gray-700 hover:text-nexar-accent transition-colors"
+												>
+													<MapPin className="h-5 w-5 text-gray-400" />
+													<span>{profile.location}</span>
+												</a>
 											</div>
 										)}
 
@@ -1186,7 +1193,9 @@ const ProfilePage = () => {
 															<div className="flex space-x-2">
 																<button
 																	onClick={(e) => {
-																		e.stopPropagation();
+																		e.preventDefault();
+																		e.stopPropagation(); 
+																		e.stopPropagation(); 
 																		handleEditListing(listing.id);
 																	}}
 																	className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-200 transition-colors flex items-center space-x-1"
@@ -1196,10 +1205,13 @@ const ProfilePage = () => {
 																</button>
 																<button
 																	onClick={(e) => {
-																		e.stopPropagation();
+																		e.preventDefault();
+																		e.stopPropagation(); 
+																		e.stopPropagation(); 
+																		e.stopPropagation(); 
 																		handleDeleteListing(listing.id);
 																	}}
-																	className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center space-x-1"
+																	className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center space-x-1 whitespace-nowrap"
 																>
 																	<X className="h-4 w-4" />
 																	<span>Șterge</span>
