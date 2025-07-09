@@ -140,6 +140,20 @@ const Header = () => {
 			console.log("🔄 Auth state changed:", event, session?.user?.email);
 
 			if (event === "SIGNED_IN" && session?.user) {
+		// Listen for auth changes - cu debounce pentru a evita multiple apeluri
+		let authChangeTimeout: NodeJS.Timeout;
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange(async (event, session) => {
+			// Debounce pentru a evita multiple apeluri rapide
+			if (authChangeTimeout) {
+				clearTimeout(authChangeTimeout);
+			}
+
+			authChangeTimeout = setTimeout(async () => {
+				console.log("🔄 Auth state changed:", event, session?.user?.email);
+
+				if (event === "SIGNED_IN" && session?.user) {
 				// Verificăm dacă utilizatorul este admin
 				const isAdminUser = await admin.isAdmin();
 				setIsAdmin(isAdminUser);
@@ -231,9 +245,13 @@ const Header = () => {
 				localStorage.removeItem("user");
 				setIsLoading(false);
 			}
+			}, 300); // Debounce de 300ms
 		});
 
 		return () => {
+			if (authChangeTimeout) {
+				clearTimeout(authChangeTimeout);
+			}
 			subscription.unsubscribe();
 		};
 	};

@@ -445,6 +445,18 @@ const CreateListingPage = () => {
 		setIsSubmitting(true);
 
 		try {
+		// Verificăm din nou dacă procesul nu a fost deja inițiat
+		if (sessionStorage.getItem('submissionInProgress') === 'true') {
+			console.log('🚫 Submission already in progress, preventing duplicate');
+			return;
+		}
+
+		// Setăm flag-urile pentru a preveni reîncărcarea și duplicate submissions
+		sessionStorage.setItem('isSubmittingListing', 'true');
+		sessionStorage.setItem('submissionInProgress', 'true');
+		setIsSubmitting(true);
+
+		try {
 			if (!userProfile) {
 				throw new Error("Profilul utilizatorului nu a fost găsit");
 			}
