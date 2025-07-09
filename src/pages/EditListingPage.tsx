@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Store, Clock, Upload, X, Plus, Minus } from 'lucide-react';
+import { Store, Clock, Upload, X } from 'lucide-react';
 import SuccessModal from '../components/SuccessModal';
 
 // Lista de mărci de motociclete
@@ -145,15 +145,6 @@ const EditListingPage = () => {
     }));
   };
 
-  const handleFeatureToggle = (feature: string) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }));
-  };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -200,6 +191,7 @@ const EditListingPage = () => {
 
   const removeImage = (index: number) => {
     const imageToRemove = formData.images[index];
+    setImagesToRemove(prev => [...prev, imageToRemove]);
     setFormData(prev => ({ 
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
