@@ -1,6 +1,3 @@
-Here's the fixed script with the missing closing brackets and parentheses added:
-
-```javascript
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -738,4 +735,3 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
-```
