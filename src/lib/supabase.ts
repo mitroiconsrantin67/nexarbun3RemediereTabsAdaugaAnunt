@@ -499,12 +499,8 @@ export const auth = {
 		try {
 			const { error } = await supabase.auth.signOut();
 
-			// Forțăm curățarea completă a sesiunii
 			if (error) {
 				console.error("❌ Error during signOut:", error);
-				// Chiar dacă avem eroare, curățăm local storage-ul
-				localStorage.clear();
-				sessionStorage.clear();
 			}
 
 			// Reîncărcăm pagina pentru a curăța complet starea
@@ -515,9 +511,6 @@ export const auth = {
 			return { error };
 		} catch (err) {
 			console.error("💥 Error in signOut:", err);
-			// Curățăm oricum storage-ul local
-			localStorage.clear();
-			sessionStorage.clear();
 			return { error: err };
 		}
 	},
