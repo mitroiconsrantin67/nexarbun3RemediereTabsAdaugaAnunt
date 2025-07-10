@@ -136,7 +136,7 @@ const HomePage = () => {
 	const filteredListings = useMemo(() => {
 		return allListings.filter((listing) => {
 			// Căutare în text
-			const searchLower = searchQuery.toLowerCase();
+			const searchLower = searchQuery.toLowerCase().trim();
 			const matchesSearch =
 				!searchQuery ||
 				listing.title.toLowerCase().includes(searchLower) ||
@@ -158,6 +158,10 @@ const HomePage = () => {
 			const matchesBrand =
 				!filters.brand ||
 				listing.brand.toLowerCase() === filters.brand.toLowerCase();
+				
+			const matchesModel = 
+				!filters.model ||
+				listing.model.toLowerCase().includes(filters.model.toLowerCase());
 
 			const matchesYear =
 				(!filters.yearMin || listing.year >= parseInt(filters.yearMin)) &&
@@ -180,6 +184,7 @@ const HomePage = () => {
 				matchesPrice &&
 				matchesCategory &&
 				matchesBrand &&
+				matchesModel &&
 				matchesYear &&
 				matchesLocation &&
 				matchesSellerType &&

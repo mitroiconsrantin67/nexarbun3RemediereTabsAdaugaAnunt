@@ -40,14 +40,7 @@ const Header = () => {
 			// Check current auth state
 			const {
 				data: { user: currentUser },
-				error: userError,
 			} = await supabase.auth.getUser();
-
-			if (userError) {
-				console.error("❌ Error getting current user:", userError);
-				setIsLoading(false);
-				return;
-			}
 
 			if (currentUser) {
 				console.log("👤 Found authenticated user:", currentUser.email);
@@ -143,7 +136,7 @@ const Header = () => {
 				localStorage.removeItem("user");
 			}
 		} catch (error) {
-			console.error("💥 Error checking auth state:", error);
+			console.error("💥 Error in initializeAuth:", error);
 			setUser(null);
 			localStorage.removeItem("user");
 		} finally {
@@ -155,24 +148,83 @@ const Header = () => {
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, session) => {
-			console.log("🔄 Auth state change detected:", event, session?.user?.email);
+			console.log("🔄 Auth state changed:", event, session?.user?.email);
 
-			if (event === "SIGNED_IN" && session?.user) {
-				console.log("🔄 Processing SIGNED_IN event");
-				// Verificăm dacă utilizatorul este admin
-				const isAdminUser = await admin.isAdmin();
-				setIsAdmin(isAdminUser);
-				
-				// Reload the user data
-				await initializeAuth();
-			} else if (event === "SIGNED_OUT") {
-				console.log("🔄 Processing SIGNED_OUT event");
-				// User signed out
-				setUser(null);
-				setIsAdmin(false);
-				localStorage.removeItem("user");
-				localStorage.removeItem("supabase.auth.token");
-			}
+			// Debounce pentru a evita multiple apeluri rapide
+			setTimeout(async () => {
+				if (event === "SIGNED_IN" && session?.user) {
+					console.log("🔄 Processing SIGNED_IN event");
+					
+					// Get user profile from database
+					const { data: profileData, error: profileError } = await supabase
+						.from("profiles")
+						.select("*")
+						.eq("user_id", session.user.id)
+						.single();
+
+					if (!profileError && profileData) {
+						const userData = {
+							id: session.user.id,
+							name: profileData.name,
+							email: profileData.email,
+							sellerType: profileData.seller_type,
+							isAdmin: profileData.is_admin || session.user.email === "admin@nexar.ro",
+							isLoggedIn: true,
+						};
+
+						setUser(userData);
+						localStorage.setItem("user", JSON.stringify(userData));
+						
+						// Verificăm dacă utilizatorul este admin
+						const isAdminUser = await admin.isAdmin();
+						setIsAdmin(isAdminUser);
+
+						// Redirect to home page after successful login
+						if (location.pathname === "/auth") {
+							navigate("/");
+						}
+					} else {
+						// Create missing profile
+						try {
+							const { data: newProfile } = await supabase
+								.from("profiles")
+								.insert([
+									{
+										user_id: session.user.id,
+										name: session.user.email?.split("@")[0] || "Utilizator",
+										email: session.user.email,
+										seller_type: "individual",
+										is_admin: session.user.email === "admin@nexar.ro",
+									},
+								])
+								.select()
+								.single();
+
+							if (newProfile) {
+								const userData = {
+									id: session.user.id,
+									name: newProfile.name,
+									email: newProfile.email,
+									sellerType: newProfile.seller_type,
+									isAdmin: newProfile.is_admin || session.user.email === "admin@nexar.ro",
+									isLoggedIn: true,
+								};
+
+								setUser(userData);
+								localStorage.setItem("user", JSON.stringify(userData));
+							}
+						} catch (error) {
+							console.error("❌ Error creating profile:", error);
+						}
+					}
+				} else if (event === "SIGNED_OUT") {
+					console.log("🔄 Processing SIGNED_OUT event");
+					setUser(null);
+					setIsAdmin(false);
+					localStorage.removeItem("user");
+				}
+				setIsLoading(false);
+			}, 300);
 		});
 		
 		return () => {
@@ -189,6 +241,7 @@ const Header = () => {
 
 			// Ștergem datele din localStorage ÎNAINTE de a face signOut
 			localStorage.removeItem("user");
+			localStorage.removeItem("supabase.auth.token");
 
 			// Deconectăm utilizatorul
 			const { error } = await auth.signOut();

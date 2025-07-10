@@ -432,9 +432,13 @@ export const auth = {
 	signIn: async (email: string, password: string) => {
 		try {
 			console.log("🔐 Starting signin process for:", email);
-
-			// Curățăm orice sesiune existentă înainte de a încerca să ne conectăm
-			await supabase.auth.signOut();
+			
+			// Verificăm dacă există o sesiune activă
+			const { data: sessionData } = await supabase.auth.getSession();
+			if (sessionData.session) {
+				console.log("🔄 Found existing session, signing out first");
+				await supabase.auth.signOut();
+			}
 
 			const { data, error } = await supabase.auth.signInWithPassword({
 				email,
@@ -494,23 +498,32 @@ export const auth = {
 
 	signOut: async () => {
 		console.log("👋 Signing out user...");
-		localStorage.removeItem("user");
 
 		try {
 			const { error } = await supabase.auth.signOut();
 
+			// Forțăm curățarea completă a sesiunii
 			if (error) {
-				console.error("❌ Error during signOut:", error);
+				console.error("❌ Error during signOut, forcing cleanup:", error);
 			}
+			
+			// Curățăm local storage-ul
+			localStorage.removeItem("user");
+			localStorage.removeItem("supabase.auth.token");
+			sessionStorage.clear();
 
 			// Reîncărcăm pagina pentru a curăța complet starea
 			setTimeout(() => {
 				window.location.reload();
-			}, 100);
+			}, 300);
 
 			return { error };
 		} catch (err) {
 			console.error("💥 Error in signOut:", err);
+			// Curățăm oricum storage-ul local
+			localStorage.removeItem("user");
+			localStorage.removeItem("supabase.auth.token");
+			sessionStorage.clear();
 			return { error: err };
 		}
 	},
@@ -1497,10 +1510,18 @@ export const isAuthenticated = async () => {
 // Funcție pentru a verifica dacă Supabase este configurat corect
 export const checkSupabaseConnection = async () => {
 	try {
+		console.log("🔍 Checking Supabase connection...");
 		const { error } = await supabase
 			.from("profiles")
 			.select("count", { count: "exact", head: true });
-		return !error;
+		
+		if (error) {
+			console.error("❌ Supabase connection check failed:", error);
+			return false;
+		}
+		
+		console.log("✅ Supabase connection check successful");
+		return true;
 	} catch (e) {
 		console.error("Supabase connection error:", e);
 		return false;

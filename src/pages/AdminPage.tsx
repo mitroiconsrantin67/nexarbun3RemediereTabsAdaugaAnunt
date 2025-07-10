@@ -664,8 +664,9 @@ const AdminPage = () => {
 															className="text-xs border border-gray-300 rounded px-2 py-1 cursor-pointer"
 															value={listing.status}
 															onChange={(e) => {
-																// Folosim valoarea selectată
+																// Folosim valoarea selectată din dropdown
 																const newStatus = e.target.value;
+																console.log("Selected new status:", newStatus);
 																handleUpdateListingStatus(listing.id, newStatus);
 															}}
 															disabled={isProcessing[listing.id]}

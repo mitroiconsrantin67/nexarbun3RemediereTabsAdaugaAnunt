@@ -28,7 +28,7 @@ import {
 import { listings, supabase } from "../lib/supabase";
 import NetworkErrorHandler from "../components/NetworkErrorHandler";
 
-const ListingDetailPage = () => {
+const ListingsPage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -386,7 +386,6 @@ const ListingDetailPage = () => {
 											}`}
 										>
 											<img
-												AAA
 												src={image}
 												alt={
 													"BRAND" +
@@ -661,4 +660,4 @@ const ListingDetailPage = () => {
 	);
 };
 
-export default ListingDetailPage;
+export default ListingsPage;
