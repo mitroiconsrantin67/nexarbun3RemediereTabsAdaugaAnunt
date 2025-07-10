@@ -24,6 +24,7 @@ import {
 	RefreshCw,
 	Store,
 	Clock,
+	Copy,
 } from "lucide-react";
 import { listings, supabase } from "../lib/supabase";
 import NetworkErrorHandler from "../components/NetworkErrorHandler";
@@ -216,6 +217,50 @@ const ListingsPage = () => {
 		window.open(url, "_blank");
 	};
 
+	const handleShare = async () => {
+		if (!listing) return;
+
+		const shareData = {
+			title: listing.title,
+			text: `Verifică această motocicletă: ${listing.brand} ${listing.model} - ${listing.price}`,
+			url: window.location.href,
+		};
+
+		try {
+			// Verificăm dacă browserul suportă Web Share API
+			if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+				await navigator.share(shareData);
+			} else {
+				// Fallback: copiază link-ul în clipboard
+				await navigator.clipboard.writeText(window.location.href);
+				
+				// Afișăm o notificare temporară
+				const button = document.querySelector('[data-share-button]') as HTMLElement;
+				if (button) {
+					const originalContent = button.innerHTML;
+					button.innerHTML = `
+						<svg class="h-4 w-4 sm:h-5 sm:w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+						</svg>
+					`;
+					
+					setTimeout(() => {
+						button.innerHTML = originalContent;
+					}, 2000);
+				}
+			}
+		} catch (error) {
+			console.error('Error sharing:', error);
+			// În caz de eroare, încercăm să copiem link-ul
+			try {
+				await navigator.clipboard.writeText(window.location.href);
+				alert('Link-ul a fost copiat în clipboard!');
+			} catch (clipboardError) {
+				console.error('Error copying to clipboard:', clipboardError);
+				alert('Nu s-a putut partaja. Copiază manual link-ul din bara de adrese.');
+			}
+		}
+	};
 	const handleSellerClick = () => {
 		if (!listing) return;
 		navigate(`/profil/${listing.seller.id}`);
@@ -340,6 +385,8 @@ const ListingsPage = () => {
 								)}
 
 								<div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex space-x-2">
+										data-share-button
+										onClick={handleShare}
 									<button className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 hover:bg-white transition-colors">
 										<Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
 									</button>
