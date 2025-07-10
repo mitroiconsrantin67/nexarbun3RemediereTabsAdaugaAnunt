@@ -183,18 +183,14 @@ const AdminPage = () => {
 		console.log("🔄 Încearcă să modifice statusul la:", listingId, status);
 		try {
 			setIsProcessing((prev) => ({ ...prev, [listingId]: true }));
-
+			
+			const { error } = await admin.updateListingStatus(listingId, status);
 
 			if (error) {
 				console.error("Error updating listing status:", error);
 				alert(
 					`Eroare la actualizarea statusului: ${
 						(error as any)?.message ?? String(error)
-					}`,
-				);
-				return;
-			}
-
 			console.log("✅ Status actualizat cu succes în frontend");
 
 			// Actualizează local
@@ -418,7 +414,7 @@ const AdminPage = () => {
 					<div className="p-6 bg-gray-900 text-white">
 						<h1 className="text-2xl font-bold">Panou de Administrare</h1>
 						<p className="text-gray-300">
-							Gestionează anunțurile și utilizatorii platformei
+							Gestionează anunțurile platformei
 						</p>
 					</div>
 
