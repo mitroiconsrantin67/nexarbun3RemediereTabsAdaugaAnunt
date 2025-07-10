@@ -77,7 +77,8 @@ const CreateListingPage: React.FC = () => {
 		color: '',
 		description: '',
 		features: [],
-		availability: 'pe_stoc'
+		availability: 'pe_stoc',
+		seller_type: 'individual' // Add seller_type to track the user's seller type
 	});
 
 	// Verificăm autentificarea la încărcarea componentei
@@ -89,6 +90,24 @@ const CreateListingPage: React.FC = () => {
 				return;
 			}
 			setIsAuthenticated(true);
+			
+			// Get user profile to determine seller type
+			try {
+				const { data: profileData } = await supabase
+					.from("profiles")
+					.select("seller_type")
+					.eq("user_id", user.id)
+					.single();
+					
+				if (profileData) {
+					setFormData(prev => ({
+						...prev,
+						seller_type: profileData.seller_type
+					}));
+				}
+			} catch (err) {
+				console.error("Error fetching user profile:", err);
+			}
 		};
 
 		checkAuth();
@@ -434,7 +453,7 @@ const CreateListingPage: React.FC = () => {
 									<select
 										value={formData.availability}
 										onChange={(e) => handleInputChange('availability', e.target.value as 'pe_stoc' | 'la_comanda')}
-										className={`w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${formData.seller_type !== 'dealer' ? 'opacity-50 cursor-not-allowed' : ''}`}
+										className={`w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}
 										disabled={formData.seller_type !== 'dealer'}
 									>
 										{availabilityTypes.map(type => (
