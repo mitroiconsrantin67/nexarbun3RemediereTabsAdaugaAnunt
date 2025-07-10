@@ -189,10 +189,6 @@ const AdminPage = () => {
 				.from("listings")
 				.update({ status })
 				.eq("id", listingId);
-			const { error } = await supabase
-				.from("listings")
-				.update({ status })
-				.eq("id", listingId);
 
 			if (error) {
 				console.error("Error updating listing status:", error);

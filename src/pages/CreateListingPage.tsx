@@ -79,7 +79,6 @@ const CreateListingPage: React.FC = () => {
 		features: [],
 		availability: 'pe_stoc',
 		seller_type: 'individual' // Add seller_type to track the user's seller type
-		seller_type: 'individual' // Add seller_type to track the user's seller type
 	});
 
 	// Verificăm autentificarea la încărcarea componentei
