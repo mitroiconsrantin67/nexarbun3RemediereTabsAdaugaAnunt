@@ -498,31 +498,30 @@ export const auth = {
 
 	signOut: async () => {
 		console.log("👋 Signing out user...");
+		localStorage.removeItem("user");
+		localStorage.removeItem("supabase.auth.token");
+		localStorage.removeItem("nexar-auth-token");
 
 		try {
 			const { error } = await supabase.auth.signOut();
 
-			// Forțăm curățarea completă a sesiunii
 			if (error) {
-				console.error("❌ Error during signOut, forcing cleanup:", error);
+				console.error("❌ Error during signOut:", error);
+				// Chiar dacă avem eroare, curățăm local storage-ul
+				localStorage.clear();
+				sessionStorage.clear();
 			}
-			
-			// Curățăm local storage-ul
-			localStorage.removeItem("user");
-			localStorage.removeItem("supabase.auth.token");
-			sessionStorage.clear();
 
 			// Reîncărcăm pagina pentru a curăța complet starea
 			setTimeout(() => {
 				window.location.reload();
-			}, 300);
+			}, 100);
 
 			return { error };
 		} catch (err) {
 			console.error("💥 Error in signOut:", err);
 			// Curățăm oricum storage-ul local
-			localStorage.removeItem("user");
-			localStorage.removeItem("supabase.auth.token");
+			localStorage.clear();
 			sessionStorage.clear();
 			return { error: err };
 		}
