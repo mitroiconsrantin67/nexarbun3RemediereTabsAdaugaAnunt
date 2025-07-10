@@ -32,6 +32,7 @@ const HomePage = () => {
 		priceMax: "",
 		category: searchParams.get("categorie") || "",
 		brand: "",
+		model: "",
 		yearMin: "",
 		yearMax: "",
 		location: "",
@@ -210,6 +211,7 @@ const HomePage = () => {
 			priceMax: "",
 			category: "",
 			brand: "",
+			model: "",
 			yearMin: "",
 			yearMax: "",
 			location: "",
@@ -652,7 +654,7 @@ const HomePage = () => {
 										<input
 											type="text"
 											placeholder="Model"
-											value={filters.model}
+											value={filters.model || ""}
 											onChange={(e) => handleFilterChange("model", e.target.value)}
 											className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nexar-accent focus:border-transparent"
 										/>
@@ -873,7 +875,7 @@ const HomePage = () => {
 										<input
 											type="text"
 											placeholder="Model"
-											value={filters.model}
+											value={filters.model || ""}
 											onChange={(e) => handleFilterChange("model", e.target.value)}
 											className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nexar-accent focus:border-transparent"
 										/>
