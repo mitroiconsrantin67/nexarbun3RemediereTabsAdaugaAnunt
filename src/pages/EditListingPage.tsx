@@ -98,6 +98,16 @@ const EditListingPage = () => {
   useEffect(() => {
     loadListing();
   }, [id]);
+  
+  useEffect(() => {
+    // Update the form data when sellerType changes
+    if (sellerType === 'dealer' && formData.availability === undefined) {
+      setFormData(prev => ({
+        ...prev,
+        availability: 'pe_stoc'
+      }));
+    }
+  }, [sellerType]);
 
   const loadListing = async () => {
     if (!id) return;
@@ -115,7 +125,6 @@ const EditListingPage = () => {
       if (data) {
         setFormData({
           id: data.id,
-          seller_type: data.seller_type || 'individual',
           title: data.title || '',
           brand: data.brand || '',
           model: data.model || '',
@@ -131,6 +140,7 @@ const EditListingPage = () => {
           features: data.features || [],
           images: data.images || []
         });
+        
         setSellerType(data.seller_type || 'individual');
       }
     } catch (error) {
@@ -445,22 +455,23 @@ const EditListingPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium text-gray-700 mb-2 ${sellerType !== 'dealer' ? 'hidden' : ''}`}>
+                <label className={`block text-sm font-medium text-gray-700 mb-2 ${sellerType === 'dealer' ? '' : 'hidden'}`}>
                   Disponibilitate
                 </label>
-                <select
+                <div className={sellerType === 'dealer' ? '' : 'hidden'}>
+                  <select
                   name="availability"
                   value={formData.availability}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${sellerType !== 'dealer' ? 'hidden' : ''}`}
-                  disabled={sellerType !== 'dealer'}
-                >
+                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
                   {availabilityOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
-                </select>
+                  </select>
+                </div>
               </div>
             </div>
 
