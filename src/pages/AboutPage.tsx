@@ -15,7 +15,7 @@ const AboutPage = () => {
           
           <div className="prose max-w-none">
             <p className="text-lg text-gray-700 mb-6">
-              Nexar este cel mai premium marketplace pentru motociclete din România, dedicat pasionaților de două roți care caută excelența în fiecare detaliu.
+              Nexar este cel mai exclusivist marketplace din România, dedicat pasionaților de două roți care caută excelența în fiecare detaliu.
             </p>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Misiunea Noastră</h2>
@@ -34,7 +34,7 @@ const AboutPage = () => {
             
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Echipa Noastră</h2>
             <p className="text-gray-700 mb-6">
-              Suntem o echipă de profesioniști pasionați de motociclete, cu experiență vastă în domeniul automotive și tehnologic. Înțelegem nevoile comunității și lucrăm constant pentru a oferi cea mai bună experiență.
+              Suntem o echipă de profesioniști pasionați, cu experiență vastă în domeniul automotive și tehnologic. Înțelegem nevoile comunității și lucrăm constant pentru a oferi cea mai bună experiență.
             </p>
             
             <div className="bg-nexar-accent/10 rounded-lg p-6 mt-8">

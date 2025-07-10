@@ -1297,7 +1297,7 @@ const HomePage = () => {
 							De Ce Să Alegi Nexar?
 						</h2>
 						<p className="text-lg text-gray-600 max-w-xl mx-auto">
-							Oferim cea mai sigură și eficientă platformă pentru cumpărarea și
+							Oferim cel mai exclusivist marketplace din România pentru cumpărarea și
 							vânzarea motocicletelor
 						</p>
 					</div>

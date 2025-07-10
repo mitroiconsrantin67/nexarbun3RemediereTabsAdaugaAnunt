@@ -59,7 +59,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-gray-300 leading-relaxed text-sm">
-              Cel mai premium marketplace pentru motociclete din România. 
+              Cel mai exclusivist marketplace din România. 
               Găsește sau vinde motocicleta perfectă cu încredere și siguranță.
             </p>
             <div className="flex space-x-4">
