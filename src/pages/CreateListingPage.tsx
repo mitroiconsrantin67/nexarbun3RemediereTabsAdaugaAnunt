@@ -56,6 +56,7 @@ const CreateListingPage: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+	const [sellerType, setSellerType] = useState('individual');
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -102,26 +103,10 @@ const CreateListingPage: React.FC = () => {
 				if (profileData) {
 					setFormData(prev => ({
 						...prev,
-						seller_type: profileData.seller_type
-					}));
-				}
-			} catch (err) {
-				console.error("Error fetching user profile:", err);
-			}
-			
-			// Get user profile to determine seller type
-			try {
-				const { data: profileData } = await supabase
-					.from("profiles")
-					.select("seller_type")
-					.eq("user_id", user.id)
-					.single();
-					
-				if (profileData) {
-					setFormData(prev => ({
 						...prev,
 						seller_type: profileData.seller_type
 					}));
+					setSellerType(profileData.seller_type);
 				}
 			} catch (err) {
 				console.error("Error fetching user profile:", err);
@@ -464,15 +449,15 @@ const CreateListingPage: React.FC = () => {
 								</div>
 
 								<div>
-									<label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}>
+									<label className={`block text-sm font-medium text-gray-700 mb-2 ${sellerType !== 'dealer' ? 'hidden' : ''}`}>
 										Disponibilitate
 									</label>
-									<div className={formData.seller_type !== 'dealer' ? 'hidden' : ''}>
+									<div className={sellerType !== 'dealer' ? 'hidden' : ''}>
 										<select
 										value={formData.availability}
 										onChange={(e) => handleInputChange('availability', e.target.value as 'pe_stoc' | 'la_comanda')}
 										className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-										disabled={formData.seller_type !== 'dealer'}
+										disabled={sellerType !== 'dealer'}
 										>
 										{availabilityTypes.map(type => (
 											<option key={type.value} value={type.value}>
