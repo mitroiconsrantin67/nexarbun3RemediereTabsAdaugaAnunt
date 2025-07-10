@@ -488,25 +488,19 @@ const ProfilePage = () => {
 								<div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
 									<div className="relative">
 										<div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-gray-200">
-											<img
-												width="96"
-												height="96"
-												src={
-													avatarPreview ||
-													profile.avatar_url ||
-													`https://ui-avatars.com/api/?name=${encodeURIComponent(
-														profile.name,
-													)}&background=random`
-												}
-												alt={profile.name}
-												className="w-full h-full object-cover"
-												onError={(e) => {
-													const target = e.currentTarget as HTMLImageElement;
-													target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-														profile.name,
-													)}&background=random`;
-												}}
-											/>
+											{(avatarPreview || profile.avatar_url) ? (
+												<img
+													width="96"
+													height="96"
+													src={avatarPreview || profile.avatar_url}
+													alt={profile.name}
+													className="w-full h-full object-cover"
+												/>
+											) : (
+												<div className="w-full h-full bg-gray-300 flex items-center justify-center">
+													<User className="h-12 w-12 text-gray-500" />
+												</div>
+											)}
 										</div>
 
 										{isEditing && (

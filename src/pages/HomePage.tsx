@@ -441,26 +441,16 @@ const HomePage = () => {
 								<div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
 									<div className="flex items-center space-x-2 text-sm text-gray-600">
 										<div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-											{sellerAvatar ? (
+											{sellerAvatar && sellerAvatar.trim() !== '' ? (
 												<img
 													loading="lazy"
 													src={sellerAvatar}
 													alt={listing.seller}
 													className="w-full h-full object-cover"
-													onError={(e) => {
-														const target = e.currentTarget as HTMLImageElement;
-														target.style.display = "none";
-														const parent = target.parentElement;
-														if (parent) {
-															parent.innerHTML = `<div class="w-full h-full bg-nexar-accent flex items-center justify-center text-white text-xs font-bold">${listing.seller
-																.charAt(0)
-																.toUpperCase()}</div>`;
-														}
-													}}
 												/>
 											) : (
-												<div className="w-full h-full bg-nexar-accent flex items-center justify-center text-white text-xs font-bold">
-													{listing.seller.charAt(0).toUpperCase()}
+												<div className="w-full h-full bg-gray-300 flex items-center justify-center">
+													<User className="h-4 w-4 text-gray-500" />
 												</div>
 											)}
 										</div>

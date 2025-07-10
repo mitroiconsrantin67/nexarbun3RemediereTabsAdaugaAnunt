@@ -616,18 +616,20 @@ const ListingsPage = () => {
 						{/* Seller Info */}
 						<div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
 							<div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-								<img
-									loading="lazy"
-									src={listing.seller.avatar}
-									alt={listing.seller.name}
-									className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"
-									onError={(e) => {
-										// Fallback la imagine placeholder dacă imaginea nu se încarcă
-										const target = e.currentTarget as HTMLImageElement;
-										target.src =
-											"https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg";
-									}}
-								/>
+								<div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden border border-gray-200">
+									{listing.seller.avatar && listing.seller.avatar.trim() !== '' ? (
+										<img
+											loading="lazy"
+											src={listing.seller.avatar}
+											alt={listing.seller.name}
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<div className="w-full h-full bg-gray-300 flex items-center justify-center">
+											<User className="h-6 w-6 text-gray-500" />
+										</div>
+									)}
+								</div>
 								<div>
 									<div className="flex items-center space-x-2">
 										<button

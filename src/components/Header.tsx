@@ -282,7 +282,7 @@ const Header = () => {
 				>
 					<div className="flex items-center space-x-2">
 						<div className="w-7 h-7 bg-nexar-accent rounded-full flex items-center justify-center text-white font-semibold text-xs">
-							{user.name ? user.name.charAt(0).toUpperCase() : "U"}
+							<User className="h-4 w-4" />
 						</div>
 						<span className="text-sm font-medium text-gray-700 hidden xl:inline">
 							Bună, {user.name || "Utilizator"}
