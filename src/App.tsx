@@ -8,7 +8,7 @@ import {
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
-import ListingDetailPage from "./pages/ListingDetailPage";
+import ListingsPage from "./pages/ListingsPage";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -53,7 +53,7 @@ function AppContent() {
 				<main className="flex-1">
 					<Routes>
 						<Route path="/" element={<HomePage />} />
-						<Route path="/anunt/:id" element={<ListingDetailPage />} />
+						<Route path="/anunt/:id" element={<ListingsPage />} />
 						<Route path="/adauga-anunt" element={<CreateListingPage />} />
 						<Route path="/editeaza-anunt/:id" element={<EditListingPage />} />
 						<Route path="/profil" element={<ProfilePage />} />
