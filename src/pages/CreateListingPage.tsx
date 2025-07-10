@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bike, Upload, X, AlertTriangle, Check, MapPin, Calendar, Gauge, Fuel, Settings, FileText, Euro, Camera, Plus, Minus } from 'lucide-react';
-import { listings, auth, romanianCities } from '../lib/supabase';
+import { listings, auth, romanianCities, supabase } from '../lib/supabase';
 import SuccessModal from '../components/SuccessModal';
 
 // Lista de mărci de motociclete
