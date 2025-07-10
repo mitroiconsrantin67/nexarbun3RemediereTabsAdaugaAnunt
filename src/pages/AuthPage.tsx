@@ -470,7 +470,7 @@ const AuthPage = () => {
 						// Redirecționăm către pagina principală după 2 secunde
 						setTimeout(() => {
 							navigate("/");
-						}, 288888000);
+						}, 2000);
 					}
 				}
 			}
