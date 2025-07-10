@@ -259,7 +259,6 @@ const CreateListingPage: React.FC = () => {
 		if (!formData.brand.trim()) newErrors.brand = 'Marca este obligatorie';
 		if (!formData.model.trim()) newErrors.model = 'Modelul este obligatoriu';
 		if (!formData.engine_capacity.trim()) newErrors.engine_capacity = 'Capacitatea motorului este obligatorie';
-		// Descrierea nu mai este obligatorie
 
 		// Validări numerice
 		if (formData.price && isNaN(Number(formData.price))) {
@@ -734,7 +733,7 @@ const CreateListingPage: React.FC = () => {
 							
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Descriere detaliată
+									Descriere
 								</label>
 								<textarea
 									value={formData.description}
@@ -743,7 +742,7 @@ const CreateListingPage: React.FC = () => {
 									className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 										errors.description ? 'border-red-500' : 'border-gray-300'
 									}`}
-									placeholder="Descriere opțională a motocicletei: stare tehnică, dotări, istoric, etc."
+									placeholder="Descriere a motocicletei: stare tehnică, dotări, istoric, etc."
 								/>
 								{errors.description && (
 									<p className="mt-1 text-sm text-red-600 flex items-center">
