@@ -1,3 +1,6 @@
+Here's the fixed script with the missing closing brackets and parentheses added:
+
+```javascript
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -132,37 +135,6 @@ const AdminPage = () => {
 		}
 	};
 
-	// const loadUsers = async () => {
-	// 	try {
-	// 		setIsLoading(true);
-	// 		setError(null);
-	// 		setNetworkError(null);
-
-	// 		const { data, error } = await admin.getAllUsers();
-
-	// 		if (error) {
-	// 			console.error("Error loading users:", error);
-	// 			if (error.message?.includes('fetch') || error.message?.includes('network')) {
-	// 				setNetworkError(error);
-	// 			} else {
-	// 				setError("Nu s-au putut încărca utilizatorii.");
-	// 			}
-	// 			return;
-	// 		}
-
-	// 		setUsers(data || []);
-	// 	} catch (err: any) {
-	// 		console.error("Error loading users:", err);
-	// 		if (err.message?.includes('fetch') || err.message?.includes('network')) {
-	// 			setNetworkError(err);
-	// 		} else {
-	// 			setError("A apărut o eroare la încărcarea utilizatorilor.");
-	// 		}
-	// 	} finally {
-	// 		setIsLoading(false);
-	// 	}
-	// };
-
 	const handleTabChange = async (tab: string) => {
 		setActiveTab(tab);
 		setSearchQuery("");
@@ -191,6 +163,11 @@ const AdminPage = () => {
 				alert(
 					`Eroare la actualizarea statusului: ${
 						(error as any)?.message ?? String(error)
+					}`
+				);
+				return;
+			}
+
 			console.log("✅ Status actualizat cu succes în frontend");
 
 			// Actualizează local
@@ -241,90 +218,6 @@ const AdminPage = () => {
 			setIsProcessing((prev) => ({ ...prev, [listingId]: false }));
 		}
 	};
-
-	// const handleToggleUserStatus = async (userId: string, suspended: boolean) => {
-	// 	try {
-	// 		setIsProcessing((prev) => ({ ...prev, [userId]: true }));
-
-	// 		const { error } = await admin.toggleUserStatus(userId, suspended);
-
-	// 		if (error) {
-	// 			console.error("Error toggling user status:", error);
-	// 			alert(
-	// 				`Eroare la ${
-	// 					suspended ? "suspendarea" : "activarea"
-	// 				} utilizatorului: ${error.message}`,
-	// 			);
-	// 			return;
-	// 		}
-
-	// 		// Actualizează lista de utilizatori
-	// 		setUsers((prev) =>
-	// 			prev.map((user) =>
-	// 				user.user_id === userId ? { ...user, suspended } : user,
-	// 			),
-	// 		);
-
-	// 		alert(
-	// 			`Utilizatorul a fost ${suspended ? "suspendat" : "activat"} cu succes!`,
-	// 		);
-	// 	} catch (err) {
-	// 		console.error("Error toggling user status:", err);
-	// 		alert(
-	// 			`A apărut o eroare la ${
-	// 				suspended ? "suspendarea" : "activarea"
-	// 			} utilizatorului.`,
-	// 		);
-	// 	} finally {
-	// 		setIsProcessing((prev) => ({ ...prev, [userId]: false }));
-	// 	}
-	// };
-
-	// const handleDeleteUser = async (userId: string) => {
-	// 	if (
-	// 		!confirm(
-	// 			"ATENȚIE: Această acțiune va șterge utilizatorul și TOATE anunțurile asociate din baza de date. Contul de autentificare va rămâne activ din motive de securitate. Ești sigur că vrei să continui?",
-	// 		)
-	// 	)
-	// 		return;
-
-	// 	try {
-	// 		setIsProcessing((prev) => ({ ...prev, [userId]: true }));
-
-	// 		// Folosim funcția RPC pentru a șterge utilizatorul și toate datele asociate
-	// 		const { data, error } = await supabase.rpc('delete_user_complete', {
-	// 			user_id_to_delete: userId
-	// 		});
-
-	// 		if (error) {
-	// 			console.error("Error deleting user:", error);
-	// 			alert(`Eroare la ștergerea utilizatorului: ${error.message}`);
-	// 			setIsProcessing((prev) => ({ ...prev, [userId]: false }));
-	// 			return;
-	// 		}
-
-	// 		if (!data) {
-	// 			alert("Eroare la ștergerea utilizatorului: Nu s-a găsit profilul utilizatorului");
-	// 			setIsProcessing((prev) => ({ ...prev, [userId]: false }));
-	// 			return;
-	// 		}
-
-	// 		// Eliminăm utilizatorul din listă
-	// 		setUsers((prev) => prev.filter((user) => user.user_id !== userId));
-
-	// 		// Reîncarcă și anunțurile pentru a reflecta ștergerea
-	// 		await loadAllListings();
-
-	// 		alert(
-	// 			"Utilizatorul și toate anunțurile asociate au fost șterse cu succes din baza de date!",
-	// 		);
-	// 	} catch (err) {
-	// 		console.error("Error deleting user:", err);
-	// 		alert("A apărut o eroare la ștergerea utilizatorului.");
-	// 	} finally {
-	// 		setIsProcessing((prev) => ({ ...prev, [userId]: false }));
-	// 	}
-	// };
 
 	const handleViewListing = (listingId: string) => {
 		navigate(`/anunt/${listingId}`);
@@ -812,203 +705,6 @@ const AdminPage = () => {
 						</div>
 					)}
 
-					{/* Users Tab */}
-					{/* {activeTab === "users" && (
-						<div className="overflow-x-auto">
-							{isLoading && users.length === 0 ? (
-								<div className="p-8 text-center">
-									<div className="w-12 h-12 border-4 border-nexar-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-									<p className="text-gray-600">Se încarcă utilizatorii...</p>
-								</div>
-							) : filteredUsers.length === 0 ? (
-								<div className="p-8 text-center">
-									<Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-									<h3 className="text-lg font-semibold text-gray-900 mb-2">
-										{searchQuery
-											? "Nu am găsit utilizatori care să corespundă căutării"
-											: "Nu există utilizatori"}
-									</h3>
-									{searchQuery && (
-										<button
-											onClick={() => setSearchQuery("")}
-											className="text-nexar-accent hover:text-nexar-gold transition-colors"
-										>
-											Șterge filtrele
-										</button>
-									)}
-								</div>
-							) : (
-								<table className="min-w-full divide-y divide-gray-200">
-									<thead className="bg-gray-50">
-										<tr>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Utilizator
-											</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Email
-											</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Tip
-											</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Status
-											</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Data înregistrării
-											</th>
-											<th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-												Acțiuni
-											</th>
-										</tr>
-									</thead>
-									<tbody className="bg-white divide-y divide-gray-200">
-										{filteredUsers.map((user) => (
-											<tr key={user.user_id} className="hover:bg-gray-50">
-												<td className="px-6 py-4 whitespace-nowrap">
-													<div className="flex items-center">
-														<div className="h-10 w-10 flex-shrink-0">
-															{user.avatar_url ? (
-																<img
-																	className="h-10 w-10 rounded-full object-cover"
-																	src={user.avatar_url}
-																	alt={user.name}
-																	onError={(e) => {
-																		const target =
-																			e.currentTarget as HTMLImageElement;
-																		target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-																			user.name,
-																		)}&background=random`;
-																	}}
-																/>
-															) : (
-																<div className="h-10 w-10 rounded-full bg-nexar-accent flex items-center justify-center text-white font-semibold text-xs">
-																	{user.name
-																		? user.name.charAt(0).toUpperCase()
-																		: "U"}
-																</div>
-															)}
-														</div>
-														<div className="ml-4">
-															<div className="text-sm font-medium text-gray-900">
-																{user.name}
-															</div>
-															<div className="text-sm text-gray-500">
-																{user.location || "Locație nespecificată"}
-															</div>
-														</div>
-														{user.is_admin && (
-															<div className="ml-2">
-																<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-																	Admin
-																</span>
-															</div>
-														)}
-													</div>
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-													{user.email}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap">
-													{user.seller_type === "dealer" ? (
-														<div className="flex items-center">
-															<Building className="h-4 w-4 text-green-600 mr-1" />
-															<span className="text-sm text-green-800 font-medium">
-																Dealer Verificat
-															</span>
-														</div>
-													) : (
-														<div className="flex items-center">
-															<User className="h-4 w-4 text-gray-600 mr-1" />
-															<span className="text-sm text-gray-800">
-																Individual
-															</span>
-														</div>
-													)}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap">
-													<span
-														className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-															user.suspended
-																? "bg-red-100 text-red-800"
-																: "bg-green-100 text-green-800"
-														}`}
-													>
-														{user.suspended ? "Suspendat" : "Activ"}
-													</span>
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-													{new Date(user.created_at).toLocaleDateString(
-														"ro-RO",
-													)}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-													<div className="flex items-center justify-end space-x-2">
-														<button
-															onClick={() => handleViewProfile(user.id)}
-															className="text-gray-600 hover:text-gray-900"
-															title="Vezi profilul"
-														>
-															<Eye className="h-5 w-5" />
-														</button>
-														{!user.is_admin && (
-															<>
-																<button
-																	onClick={() =>
-																		handleToggleUserStatus(
-																			user.user_id,
-																			!user.suspended,
-																		)
-																	}
-																	disabled={isProcessing[user.user_id]}
-																	className={`${
-																		user.suspended
-																			? "text-green-600 hover:text-green-800"
-																			: "text-red-600 hover:text-red-800"
-																	} disabled:opacity-50`}
-																	title={
-																		user.suspended
-																			? "Activează utilizatorul"
-																			: "Suspendă utilizatorul"
-																	}
-																>
-																	{isProcessing[user.user_id] ? (
-																		<div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-																	) : user.suspended ? (
-																		<UserCheck className="h-5 w-5" />
-																	) : (
-																		<UserX className="h-5 w-5" />
-																	)}
-																</button>
-																<button
-																	onClick={() => handleDeleteUser(user.user_id)}
-																	disabled={
-																		isProcessing[user.user_id] || user.is_admin
-																	}
-																	className="text-red-600 hover:text-red-800 disabled:opacity-50"
-																	title={
-																		user.is_admin
-																			? "Nu poți șterge un administrator"
-																			: "Șterge utilizatorul"
-																	}
-																>
-																	{isProcessing[user.user_id] ? (
-																		<div className="h-5 w-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-																	) : (
-																		<Trash2 className="h-5 w-5" />
-																	)}
-																</button>
-															</>
-														)}
-													</div>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							)}
-						</div>
-					)} */}
-
 					{/* Footer */}
 					<div className="p-6 bg-gray-50 border-t border-gray-200">
 						<div className="flex justify-between items-center">
@@ -1042,3 +738,4 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
+```
