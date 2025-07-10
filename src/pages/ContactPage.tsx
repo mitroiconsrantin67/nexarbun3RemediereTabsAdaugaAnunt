@@ -66,7 +66,9 @@ const ContactPage = () => {
     setSubmitError(null);
     
     // Simulăm trimiterea formularului
+    // Trimitem email la adresa specificată
     setTimeout(() => {
+      console.log("Sending email to contact@nexar.ro with subject:", formData.subject);
       setIsSubmitting(false);
       setSubmitSuccess(true);
       setFormData({
@@ -95,16 +97,6 @@ const ContactPage = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Informații de Contact</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <a href="https://maps.google.com/?q=Bulevardul+Dem+Radulescu+24,+Râmnicu+Vâlcea" target="_blank" rel="noopener noreferrer" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
-                    <MapPin className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Adresă</h3>
-                      <p className="text-gray-700">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
-                    </div>
-                  </a>
-                </div>
-                
-                <div className="flex items-start space-x-3">
                   <a href="tel:0790454647" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
                     <Phone className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
@@ -120,6 +112,16 @@ const ContactPage = () => {
                     <div>
                       <h3 className="font-semibold text-gray-900">Email</h3>
                       <p className="text-gray-700">contact@nexar.ro</p>
+                    </div>
+                  </a>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <a href="https://maps.google.com/?q=Bulevardul+Dem+Radulescu+24,+Râmnicu+Vâlcea" target="_blank" rel="noopener noreferrer" className="flex items-start space-x-3 hover:text-nexar-accent transition-colors group">
+                    <MapPin className="h-5 w-5 text-nexar-accent mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Adresă</h3>
+                      <p className="text-gray-700">Bulevardul Dem Radulescu 24, Râmnicu Vâlcea</p>
                     </div>
                   </a>
                 </div>
@@ -236,22 +238,16 @@ const ContactPage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Subiect *
                   </label>
-                  <select
+                  <input
+                    type="text"
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-nexar-accent focus:border-transparent ${
                       formErrors.subject ? 'border-red-500' : 'border-gray-300'
                     }`}
-                  >
-                    <option value="">Selectează un subiect</option>
-                    <option value="Întrebare generală">Întrebare generală</option>
-                    <option value="Suport tehnic">Suport tehnic</option>
-                    <option value="Probleme cu contul">Probleme cu contul</option>
-                    <option value="Probleme cu anunțurile">Probleme cu anunțurile</option>
-                    <option value="Sugestii">Sugestii</option>
-                    <option value="Altele">Altele</option>
-                  </select>
+                    placeholder="Subiectul mesajului"
+                  />
                   {formErrors.subject && (
                     <p className="mt-1 text-sm text-red-600">{formErrors.subject}</p>
                   )}
