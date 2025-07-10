@@ -79,6 +79,7 @@ const CreateListingPage: React.FC = () => {
 		features: [],
 		availability: 'pe_stoc',
 		seller_type: 'individual' // Add seller_type to track the user's seller type
+		seller_type: 'individual' // Add seller_type to track the user's seller type
 	});
 
 	// Verificăm autentificarea la încărcarea componentei
@@ -90,6 +91,24 @@ const CreateListingPage: React.FC = () => {
 				return;
 			}
 			setIsAuthenticated(true);
+			
+			// Get user profile to determine seller type
+			try {
+				const { data: profileData } = await supabase
+					.from("profiles")
+					.select("seller_type")
+					.eq("user_id", user.id)
+					.single();
+					
+				if (profileData) {
+					setFormData(prev => ({
+						...prev,
+						seller_type: profileData.seller_type
+					}));
+				}
+			} catch (err) {
+				console.error("Error fetching user profile:", err);
+			}
 			
 			// Get user profile to determine seller type
 			try {
@@ -232,7 +251,7 @@ const CreateListingPage: React.FC = () => {
 	const validateForm = (): boolean => {
 		const newErrors: FormErrors = {};
 
-		// Validări obligatorii
+		// Validări obligatorii (fără descriere)
 		if (!formData.title.trim()) newErrors.title = 'Titlul este obligatoriu';
 		if (!formData.price.trim()) newErrors.price = 'Prețul este obligatoriu';
 		if (!formData.location.trim()) newErrors.location = 'Locația este obligatorie';
@@ -241,7 +260,6 @@ const CreateListingPage: React.FC = () => {
 		if (!formData.brand.trim()) newErrors.brand = 'Marca este obligatorie';
 		if (!formData.model.trim()) newErrors.model = 'Modelul este obligatoriu';
 		if (!formData.engine_capacity.trim()) newErrors.engine_capacity = 'Capacitatea motorului este obligatorie';
-		if (!formData.description.trim()) newErrors.description = 'Descrierea este obligatorie';
 
 		// Validări numerice
 		if (formData.price && isNaN(Number(formData.price))) {
@@ -450,18 +468,20 @@ const CreateListingPage: React.FC = () => {
 									<label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'opacity-50' : ''}`}>
 										Disponibilitate
 									</label>
-									<select
+									<div className={formData.seller_type !== 'dealer' ? 'hidden' : ''}>
+										<select
 										value={formData.availability}
 										onChange={(e) => handleInputChange('availability', e.target.value as 'pe_stoc' | 'la_comanda')}
-										className={`w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}
+										className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
 										disabled={formData.seller_type !== 'dealer'}
-									>
+										>
 										{availabilityTypes.map(type => (
 											<option key={type.value} value={type.value}>
 												{type.label}
 											</option>
 										))}
-									</select>
+										</select>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -714,7 +734,7 @@ const CreateListingPage: React.FC = () => {
 							
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Descriere detaliată *
+									Descriere detaliată
 								</label>
 								<textarea
 									value={formData.description}
@@ -723,7 +743,7 @@ const CreateListingPage: React.FC = () => {
 									className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
 										errors.description ? 'border-red-500' : 'border-gray-300'
 									}`}
-									placeholder="Descrie motocicleta în detaliu: starea tehnică, dotările, istoricul, etc."
+									placeholder="Descriere opțională a motocicletei: stare tehnică, dotări, istoric, etc."
 								/>
 								{errors.description && (
 									<p className="mt-1 text-sm text-red-600 flex items-center">

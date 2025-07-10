@@ -207,6 +207,15 @@ const EditListingPage = () => {
     }));
   };
 
+  const handleFeatureToggle = (feature: string) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature]
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -466,11 +475,10 @@ const EditListingPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Descriere
               </label>
-              <textarea
+              <input
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="Descriere detaliată a motocicletei..."
               />

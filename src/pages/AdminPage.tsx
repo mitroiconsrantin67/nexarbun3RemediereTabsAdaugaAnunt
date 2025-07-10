@@ -189,6 +189,10 @@ const AdminPage = () => {
 				.from("listings")
 				.update({ status })
 				.eq("id", listingId);
+			const { error } = await supabase
+				.from("listings")
+				.update({ status })
+				.eq("id", listingId);
 
 			if (error) {
 				console.error("Error updating listing status:", error);
@@ -666,6 +670,7 @@ const AdminPage = () => {
 															onChange={(e) => {
 																// Folosim valoarea selectată din dropdown
 																const newStatus = e.target.value;
+																console.log("Selected new status:", newStatus);
 																console.log("Selected new status:", newStatus);
 																handleUpdateListingStatus(listing.id, newStatus);
 															}}
