@@ -179,12 +179,16 @@ const AdminPage = () => {
 	const handleUpdateListingStatus = async (
 		listingId: string,
 		status: string,
-	) => {
+	) => {		
 		console.log("🔄 Încearcă să modifice statusul la:", listingId, status);
 		try {
 			setIsProcessing((prev) => ({ ...prev, [listingId]: true }));
 
-			const { error } = await admin.updateListingStatus(listingId, status);
+			// Folosim direct supabase pentru a actualiza statusul
+			const { error } = await supabase
+				.from("listings")
+				.update({ status })
+				.eq("id", listingId);
 
 			if (error) {
 				console.error("Error updating listing status:", error);
@@ -657,11 +661,11 @@ const AdminPage = () => {
 													</span>
 													<div className="mt-2">
 														<select
-															className="text-xs border border-gray-300 rounded px-2 py-1"
+															className="text-xs border border-gray-300 rounded px-2 py-1 cursor-pointer"
 															value={listing.status}
 															onChange={(e) => {
-																// Setăm automat statusul la "pending" pentru a preveni modificări accidentale
-																const newStatus = "pending";
+																// Folosim valoarea selectată
+																const newStatus = e.target.value;
 																handleUpdateListingStatus(listing.id, newStatus);
 															}}
 															disabled={isProcessing[listing.id]}

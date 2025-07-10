@@ -25,13 +25,14 @@ const Header = () => {
 	const initializeAuth = async () => {
 		try {
 			setIsLoading(true);
+			console.log("🔄 Initializing auth...");
 
 			// Check Supabase connection
 			const connected = await checkSupabaseConnection();
 			setIsConnected(connected);
 
 			if (!connected) {
-				console.warn("⚠️ Supabase connection failed");
+				console.warn("⚠️ Supabase connection failed, aborting auth initialization");
 				setIsLoading(false);
 				return;
 			}
@@ -39,7 +40,14 @@ const Header = () => {
 			// Check current auth state
 			const {
 				data: { user: currentUser },
+				error: userError,
 			} = await supabase.auth.getUser();
+
+			if (userError) {
+				console.error("❌ Error getting current user:", userError);
+				setIsLoading(false);
+				return;
+			}
 
 			if (currentUser) {
 				console.log("👤 Found authenticated user:", currentUser.email);
@@ -55,7 +63,11 @@ const Header = () => {
 					.eq("user_id", currentUser.id)
 					.single();
 
-				if (!profileError && profileData) {
+				if (profileError) {
+					console.error("❌ Error fetching profile:", profileError);
+				}
+
+				if (profileData) {
 					console.log("✅ Profile found:", profileData.name);
 
 					const userData = {
@@ -71,7 +83,7 @@ const Header = () => {
 					setUser(userData);
 					localStorage.setItem("user", JSON.stringify(userData));
 				} else {
-					console.warn("⚠️ Profile not found for authenticated user");
+					console.warn("⚠️ Profile not found for authenticated user, creating one");
 
 					// Creăm automat profilul lipsă
 					try {
@@ -89,7 +101,9 @@ const Header = () => {
 							.select()
 							.single();
 
-						if (newProfile) {
+						console.log("✅ Created new profile:", newProfile);
+
+						if (newProfile) {							
 							const userData = {
 								id: currentUser.id,
 								name: newProfile.name,
@@ -102,6 +116,7 @@ const Header = () => {
 
 							setUser(userData);
 							localStorage.setItem("user", JSON.stringify(userData));
+							console.log("✅ User data saved to localStorage:", userData);
 						} else {
 							setUser({
 								id: currentUser.id,
@@ -109,6 +124,7 @@ const Header = () => {
 								isAdmin: currentUser.email === "admin@nexar.ro",
 								isLoggedIn: true,
 							});
+							console.log("⚠️ Created minimal user data without profile");
 						}
 					} catch (profileCreateError) {
 						console.error("❌ Error creating profile:", profileCreateError);
@@ -123,6 +139,7 @@ const Header = () => {
 			} else {
 				console.log("👤 No authenticated user");
 				setUser(null);
+				localStorage.removeItem("supabase.auth.token");
 				localStorage.removeItem("user");
 			}
 		} catch (error) {
@@ -130,6 +147,7 @@ const Header = () => {
 			setUser(null);
 			localStorage.removeItem("user");
 		} finally {
+			console.log("✅ Auth initialization completed");
 			setIsLoading(false);
 		}
 
@@ -137,125 +155,29 @@ const Header = () => {
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, session) => {
-			console.log("🔄 Auth state changed:", event, session?.user?.email);
+			console.log("🔄 Auth state change detected:", event, session?.user?.email);
 
 			if (event === "SIGNED_IN" && session?.user) {
-				// Listen for auth changes - cu debounce pentru a evita multiple apeluri
-				let authChangeTimeout: NodeJS.Timeout;
-				const {
-					data: { subscription },
-				} = supabase.auth.onAuthStateChange(async (event, session) => {
-					// Debounce pentru a evita multiple apeluri rapide
-					if (authChangeTimeout) {
-						clearTimeout(authChangeTimeout);
-					}
-
-					authChangeTimeout = setTimeout(async () => {
-						console.log("🔄 Auth state changed:", event, session?.user?.email);
-
-						if (event === "SIGNED_IN" && session?.user) {
-							// Verificăm dacă utilizatorul este admin
-							const isAdminUser = await admin.isAdmin();
-							setIsAdmin(isAdminUser);
-
-							// User signed in - get profile
-							const { data: profileData, error: profileError } = await supabase
-								.from("profiles")
-								.select("*")
-								.eq("user_id", session.user.id)
-								.single();
-
-							if (!profileError && profileData) {
-								const userData = {
-									id: session.user.id,
-									name: profileData.name,
-									email: profileData.email,
-									sellerType: profileData.seller_type,
-									isAdmin:
-										profileData.is_admin || session.user.email === "admin@nexar.ro",
-									isLoggedIn: true,
-								};
-
-								setUser(userData);
-								localStorage.setItem("user", JSON.stringify(userData));
-
-								// Redirect to home page after successful login
-								if (location.pathname === "/auth") {
-									navigate("/");
-								}
-							} else {
-								// Creăm automat profilul lipsă
-								try {
-									const { data: newProfile } = await supabase
-										.from("profiles")
-										.insert([
-											{
-												user_id: session.user.id,
-												name: session.user.email?.split("@")[0] || "Utilizator",
-												email: session.user.email,
-												seller_type: "individual",
-												is_admin: session.user.email === "admin@nexar.ro",
-											},
-										])
-										.select()
-										.single();
-
-									if (newProfile) {
-										const userData = {
-											id: session.user.id,
-											name: newProfile.name,
-											email: newProfile.email,
-											sellerType: newProfile.seller_type,
-											isAdmin:
-												newProfile.is_admin ||
-												session.user.email === "admin@nexar.ro",
-											isLoggedIn: true,
-										};
-
-										setUser(userData);
-										localStorage.setItem("user", JSON.stringify(userData));
-
-										// Redirect to home page after successful login
-										if (location.pathname === "/auth") {
-											navigate("/");
-										}
-									} else {
-										setUser({
-											id: session.user.id,
-											email: session.user.email,
-											isAdmin: session.user.email === "admin@nexar.ro",
-											isLoggedIn: true,
-										});
-									}
-								} catch (profileCreateError) {
-									console.error("❌ Error creating profile:", profileCreateError);
-									setUser({
-										id: session.user.id,
-										email: session.user.email,
-										isAdmin: session.user.email === "admin@nexar.ro",
-										isLoggedIn: true,
-									});
-								}
-							}
-							setIsLoading(false);
-						} else if (event === "SIGNED_OUT") {
-							// User signed out
-							setUser(null);
-							setIsAdmin(false);
-							localStorage.removeItem("user");
-							setIsLoading(false);
-						}
-					}, 300); // Debounce de 300ms
-				});
-
-				return () => {
-					if (authChangeTimeout) {
-						clearTimeout(authChangeTimeout);
-					}
-					subscription.unsubscribe();
-				};
+				console.log("🔄 Processing SIGNED_IN event");
+				// Verificăm dacă utilizatorul este admin
+				const isAdminUser = await admin.isAdmin();
+				setIsAdmin(isAdminUser);
+				
+				// Reload the user data
+				await initializeAuth();
+			} else if (event === "SIGNED_OUT") {
+				console.log("🔄 Processing SIGNED_OUT event");
+				// User signed out
+				setUser(null);
+				setIsAdmin(false);
+				localStorage.removeItem("user");
+				localStorage.removeItem("supabase.auth.token");
 			}
 		});
+		
+		return () => {
+			subscription.unsubscribe();
+		};
 	};
 
 	const isActive = (path: string) => location.pathname === path;
