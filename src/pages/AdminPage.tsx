@@ -179,16 +179,11 @@ const AdminPage = () => {
 	const handleUpdateListingStatus = async (
 		listingId: string,
 		status: string,
-	) => {		
+	) => {
 		console.log("🔄 Încearcă să modifice statusul la:", listingId, status);
 		try {
 			setIsProcessing((prev) => ({ ...prev, [listingId]: true }));
 
-			// Folosim direct supabase pentru a actualiza statusul
-			const { error } = await supabase
-				.from("listings")
-				.update({ status })
-				.eq("id", listingId);
 
 			if (error) {
 				console.error("Error updating listing status:", error);

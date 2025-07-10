@@ -74,6 +74,7 @@ const EditListingPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [sellerType, setSellerType] = useState('individual');
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -114,6 +115,7 @@ const EditListingPage = () => {
       if (data) {
         setFormData({
           id: data.id,
+          seller_type: data.seller_type || 'individual',
           title: data.title || '',
           brand: data.brand || '',
           model: data.model || '',
@@ -129,6 +131,7 @@ const EditListingPage = () => {
           features: data.features || [],
           images: data.images || []
         });
+        setSellerType(data.seller_type || 'individual');
       }
     } catch (error) {
       console.error('Error loading listing:', error);
@@ -442,15 +445,15 @@ const EditListingPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}>
+                <label className={`block text-sm font-medium text-gray-700 mb-2 ${sellerType !== 'dealer' ? 'hidden' : ''}`}>
                   Disponibilitate
                 </label>
                 <select
                   name="availability"
                   value={formData.availability}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}
-                  disabled={formData.seller_type !== 'dealer'}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${sellerType !== 'dealer' ? 'hidden' : ''}`}
+                  disabled={sellerType !== 'dealer'}
                 >
                   {availabilityOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -466,12 +469,14 @@ const EditListingPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Descriere
               </label>
-              <input
+              <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
+                rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="Descriere detaliată a motocicletei..."
+                required={false}
               />
             </div>
 

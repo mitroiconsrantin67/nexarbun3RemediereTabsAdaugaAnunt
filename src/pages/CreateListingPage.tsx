@@ -250,7 +250,7 @@ const CreateListingPage: React.FC = () => {
 	const validateForm = (): boolean => {
 		const newErrors: FormErrors = {};
 
-		// Validări obligatorii (fără descriere)
+		// Validări obligatorii
 		if (!formData.title.trim()) newErrors.title = 'Titlul este obligatoriu';
 		if (!formData.price.trim()) newErrors.price = 'Prețul este obligatoriu';
 		if (!formData.location.trim()) newErrors.location = 'Locația este obligatorie';
@@ -259,6 +259,7 @@ const CreateListingPage: React.FC = () => {
 		if (!formData.brand.trim()) newErrors.brand = 'Marca este obligatorie';
 		if (!formData.model.trim()) newErrors.model = 'Modelul este obligatoriu';
 		if (!formData.engine_capacity.trim()) newErrors.engine_capacity = 'Capacitatea motorului este obligatorie';
+		// Descrierea nu mai este obligatorie
 
 		// Validări numerice
 		if (formData.price && isNaN(Number(formData.price))) {
@@ -464,7 +465,7 @@ const CreateListingPage: React.FC = () => {
 								</div>
 
 								<div>
-									<label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'opacity-50' : ''}`}>
+									<label className={`block text-sm font-medium text-gray-700 mb-2 ${formData.seller_type !== 'dealer' ? 'hidden' : ''}`}>
 										Disponibilitate
 									</label>
 									<div className={formData.seller_type !== 'dealer' ? 'hidden' : ''}>
